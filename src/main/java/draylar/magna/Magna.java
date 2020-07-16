@@ -1,19 +1,11 @@
 package draylar.magna;
 
-import draylar.magna.api.event.ToolRadiusCallback;
-import draylar.magna.api.optional.MagnaOptionals;
 import draylar.magna.config.MagnaConfig;
-import draylar.magna.item.HammerItem;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
-import net.minecraft.item.ToolMaterials;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class Magna implements ModInitializer {
 
@@ -21,15 +13,7 @@ public class Magna implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Registry.register(
-                Registry.ITEM,
-                id("cool_hammer"),
-                new HammerItem(ToolMaterials.DIAMOND, 3, 3, new Item.Settings(), 1)
-        );
 
-        ToolRadiusCallback.EVENT.register((tool, currentRadius) -> currentRadius + EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, tool));
-
-        MagnaOptionals.optIn();
     }
 
     /**
