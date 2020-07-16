@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "magna",
+  "version": "${version}",
+  "name": "Magna",
+  "description": "Magna is the library that powers Vanilla Hammers and other large-break tool mods.",
+  "authors": [
+    "Draylar"
+  ],
+  "license": "CC0-1.0",
+  "icon": "assets/magna/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "draylar.magna.Magna"
+    ],
+    "modmenu": [
+      "draylar.magna.integration.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "magna.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.8.9+build.203",
+    "fabric": "*",
+    "minecraft": "1.16.1"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "draylar.magna.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerInventoryMixin",
+    "ServerPlayerInteractionManagerMixin",
+    "WorldMixin"
+  ],
+  "client": [
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
