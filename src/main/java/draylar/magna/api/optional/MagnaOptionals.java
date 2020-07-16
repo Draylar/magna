@@ -27,7 +27,7 @@ public class MagnaOptionals {
      * The Curse of Gigantism works on all {@link draylar.magna.item.ExcavatorItem} and {@link draylar.magna.item.HammerItem} tools,
      * and will increase the radius of the tool by 1 at the cost of 80% speed.
      */
-    public static void optIn() {
+    public static void optInForCurse() {
         if(CURSE_OF_GIGANTISM == null) {
             CURSE_OF_GIGANTISM = Registry.register(
                     Registry.ENCHANTMENT,

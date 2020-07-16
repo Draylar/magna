@@ -19,8 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(World.class)
 public abstract class WorldMixin implements WorldAccess, AutoCloseable {
 
-    @Unique
-    private Entity magna_cachedEntity = null;
+    @Unique private Entity magna_cachedEntity = null;
 
     @Inject(
             method = "breakBlock",

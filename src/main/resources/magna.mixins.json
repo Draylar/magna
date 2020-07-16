@@ -3,6 +3,7 @@
   "package": "draylar.magna.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "BlockMixin",
     "PlayerInventoryMixin",
     "ServerPlayerInteractionManagerMixin",
     "WorldMixin"

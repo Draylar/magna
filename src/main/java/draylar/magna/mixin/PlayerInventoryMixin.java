@@ -17,11 +17,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class PlayerInventoryMixin {
 
     @Shadow @Final public PlayerEntity player;
-
     @Shadow @Final public DefaultedList<ItemStack> main;
-
     @Shadow public int selectedSlot;
 
+    /**
+     * Hijacks the tool break speed check to account for the {@link ToolMiningSpeedMultiplierCallback}.
+     *
+     * @param state  {@link BlockState} being broken
+     * @param cir    mixin callback info
+     */
     @Inject(
             method = "getBlockBreakingSpeed",
             at = @At("RETURN"),

@@ -33,7 +33,7 @@ public class ServerPlayerInteractionManagerMixin {
         ItemStack heldStack = player.getMainHandStack();
 
         if (heldStack.getItem() instanceof MagnaTool) {
-            ((MagnaTool) heldStack.getItem()).attemptBreak(world, pos, player, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
+            ((MagnaTool) heldStack.getItem()).attemptBreak(world, pos, player, ((MagnaTool) heldStack.getItem()).getRadius(heldStack), ((MagnaTool) heldStack.getItem()).getProcessor(world, player, pos, heldStack));
         }
     }
 }

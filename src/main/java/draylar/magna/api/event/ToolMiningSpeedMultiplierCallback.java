@@ -18,14 +18,12 @@ import net.minecraft.item.ItemStack;
 public interface ToolMiningSpeedMultiplierCallback {
 
     Event<ToolMiningSpeedMultiplierCallback> EVENT = EventFactory.createArrayBacked(ToolMiningSpeedMultiplierCallback.class,
-            listeners -> (tool, state, player, currentRadius) -> {
-                float radius = ((MagnaTool) tool.getItem()).getRadius(tool);
-
+            listeners -> (tool, state, player, currentMultiplier) -> {
                 for (ToolMiningSpeedMultiplierCallback callback : listeners) {
-                    radius = callback.getMultiplier(tool, state, player, radius);
+                    currentMultiplier = callback.getMultiplier(tool, state, player, currentMultiplier);
                 }
 
-                return radius;
+                return currentMultiplier;
             });
 
     /**

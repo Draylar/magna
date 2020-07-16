@@ -2,6 +2,7 @@ package draylar.magna.api;
 
 import draylar.magna.Magna;
 import draylar.magna.api.event.ToolRadiusCallback;
+import net.minecraft.block.InfestedBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +33,25 @@ public interface MagnaTool {
      */
     int getRadius(ItemStack stack);
 
+    /**
+     * @return whether or not this {@link MagnaTool} should run sound/particle effects when neighboring blocks are broken.
+     */
     boolean playBreakEffects();
+
+    /**
+     * Defines behavior about how this {@link MagnaTool} should process block drops.
+     * <p>
+     * This is useful for mechanics such as auto-smelt or removing stacks that shouldn't be dropped while using a certain tool.
+     *
+     * @param world      world the stack is being dropped in
+     * @param player     player that caused the stack to drop
+     * @param pos        position of the block dropping the stack
+     * @param heldStack  {@link MagnaTool} currently being held by the player
+     * @return           a {@link BlockProcessor} that defines information about how this tool should process dropped items
+     */
+    default BlockProcessor getProcessor(World world, PlayerEntity player, BlockPos pos, ItemStack heldStack) {
+        return (tool, input) -> input;
+    }
 
     /**
      * Provides simple functionality for tools attempting to break blocks in a certain radius.
@@ -46,7 +65,7 @@ public interface MagnaTool {
      * @param breakRadius  radius to break blocks in, 1 is 3x3, 2 is 5x5
      * @return             whether the break was successful
      */
-    default boolean attemptBreak(World world, BlockPos pos, PlayerEntity player, int breakRadius) {
+    default boolean attemptBreak(World world, BlockPos pos, PlayerEntity player, int breakRadius, BlockProcessor processor) {
         if (Magna.CONFIG.breakSingleBlockWhenSneaking && player.isSneaking()) {
             return true;
         }
@@ -63,10 +82,15 @@ public interface MagnaTool {
             // break blocks
             BlockBreaker.breakInRadius(world, player, radius, (breakState) -> {
                 double hardness = breakState.getHardness(null, null);
-                boolean isEffective = mainHandStack.isEffectiveOn(breakState);
-                boolean verifyHardness = hardness < originHardness * 5 && hardness > 0;
+
+                // special-case infested blocks for mining
+                boolean isEffective = mainHandStack.isEffectiveOn(breakState) || breakState.getBlock() instanceof InfestedBlock;
+
+                // ensure hardness is within reasonable bounds of the original hardness, and is over 0 (unless the state is an infested block, special case)
+                boolean verifyHardness = hardness < originHardness * 5 && (breakState.getBlock() instanceof InfestedBlock || hardness > 0);
+
                 return isEffective && verifyHardness;
-            }, true);
+            }, processor, true);
         }
 
         return true;
