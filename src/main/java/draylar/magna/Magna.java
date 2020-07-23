@@ -1,11 +1,15 @@
 package draylar.magna;
 
 import draylar.magna.config.MagnaConfig;
+import draylar.magna.item.ExcavatorItem;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
+import net.minecraft.item.ToolMaterials;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class Magna implements ModInitializer {
 
@@ -13,7 +17,11 @@ public class Magna implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        Registry.register(
+                Registry.ITEM,
+                new Identifier("magna", "test"),
+                new ExcavatorItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
+        );
     }
 
     /**

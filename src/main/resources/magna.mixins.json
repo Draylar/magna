@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "BlockMixin",
+    "MiningToolItemAccessor",
     "PlayerInventoryMixin",
     "ServerPlayerInteractionManagerMixin",
     "WorldMixin"
