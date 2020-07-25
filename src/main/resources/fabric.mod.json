@@ -18,6 +18,9 @@
       "draylar.magna.integration.ModMenuIntegration"
     ]
   },
+  "custom": {
+    "modmenu:api": true
+  },
   "mixins": [
     "magna.mixins.json"
   ],

@@ -1,7 +1,7 @@
 package draylar.magna;
 
 import draylar.magna.config.MagnaConfig;
-import draylar.magna.item.ExcavatorItem;
+import draylar.magna.item.HammerItem;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
@@ -17,11 +17,13 @@ public class Magna implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Registry.register(
-                Registry.ITEM,
-                new Identifier("magna", "test"),
-                new ExcavatorItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
-        );
+        if(FabricLoader.getInstance().isDevelopmentEnvironment()) {
+            Registry.register(
+                    Registry.ITEM,
+                    new Identifier("magna", "test"),
+                    new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
+            );
+        }
     }
 
     /**

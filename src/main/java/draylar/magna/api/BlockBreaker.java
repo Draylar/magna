@@ -38,7 +38,7 @@ public class BlockBreaker {
                 BlockState state = world.getBlockState(pos);
 
                 // ensure the tool or mechanic can break the given state
-                if(breakValidator.canBreak(state)) {
+                if(breakValidator.canBreak(state) && !state.isAir()) {
                     world.breakBlock(pos, false, player);
                     state.getBlock().onBreak(world, pos, state, player);
 

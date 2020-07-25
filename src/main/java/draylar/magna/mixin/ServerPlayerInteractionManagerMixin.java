@@ -33,7 +33,12 @@ public class ServerPlayerInteractionManagerMixin {
         ItemStack heldStack = player.getMainHandStack();
 
         if (heldStack.getItem() instanceof MagnaTool) {
-            ((MagnaTool) heldStack.getItem()).attemptBreak(world, pos, player, ((MagnaTool) heldStack.getItem()).getRadius(heldStack), ((MagnaTool) heldStack.getItem()).getProcessor(world, player, pos, heldStack));
+            boolean v = ((MagnaTool) heldStack.getItem()).attemptBreak(world, pos, player, ((MagnaTool) heldStack.getItem()).getRadius(heldStack), ((MagnaTool) heldStack.getItem()).getProcessor(world, player, pos, heldStack));
+
+            // only cancel if the break was successful (false is returned if the player is sneaking)
+            if(v) {
+                cir.setReturnValue(true);
+            }
         }
     }
 }

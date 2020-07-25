@@ -9,5 +9,6 @@
   "text.autoconfig.magna.category.default": "General",
   "text.autoconfig.magna.title": "Magna Config",
 
-  "enchantment.magna.gigantism_curse": "Curse of Gigantism"
+  "enchantment.magna.gigantism_curse": "Curse of Gigantism",
+  "enchantment.magna.gigantism_curse_desc": "Grants a larger Hammer break radius at the cost of mining speed."
 }

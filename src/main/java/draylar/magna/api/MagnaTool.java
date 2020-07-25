@@ -67,7 +67,7 @@ public interface MagnaTool {
      */
     default boolean attemptBreak(World world, BlockPos pos, PlayerEntity player, int breakRadius, BlockProcessor processor) {
         if (Magna.CONFIG.breakSingleBlockWhenSneaking && player.isSneaking()) {
-            return true;
+            return false;
         }
 
         // calculate initial hardness & get current breaking stack
