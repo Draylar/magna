@@ -3,10 +3,10 @@ package draylar.magna.api;
 import draylar.magna.Magna;
 import draylar.magna.api.event.ToolRadiusCallback;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.InfestedBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 /**
@@ -54,7 +54,11 @@ public interface MagnaTool {
         return (tool, input) -> input;
     }
     
-    default boolean isBlockValidForBreaking(BlockState blockState, ItemStack stack) {
+    default boolean isBlockValidForBreaking(BlockView view, BlockPos pos, ItemStack stack) {
+        BlockState blockState = view.getBlockState(pos);
+        if (blockState.getHardness(view, pos) == -1.0) {
+            return false;
+        }
         if (stack.isEffectiveOn(blockState)) {
             return true;
         }
@@ -87,11 +91,11 @@ public interface MagnaTool {
 
         // only do a 3x3 break if the player's tool is effective on the block they are breaking
         // this makes it so breaking gravel doesn't break nearby stone
-        if (isBlockValidForBreaking(world.getBlockState(pos), mainHandStack)) {
+        if (isBlockValidForBreaking(world, pos, mainHandStack)) {
             int radius = ToolRadiusCallback.EVENT.invoker().getRadius(mainHandStack, breakRadius);
 
             // break blocks
-            BlockBreaker.breakInRadius(world, player, radius, (breakState) -> isBlockValidForBreaking(breakState, mainHandStack), processor, true);
+            BlockBreaker.breakInRadius(world, player, radius, (view, breakPos) -> isBlockValidForBreaking(view, breakPos, mainHandStack), processor, true);
             return true;
         }
 
