@@ -2,6 +2,7 @@ package draylar.magna.api;
 
 import draylar.magna.Magna;
 import draylar.magna.api.event.ToolRadiusCallback;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.InfestedBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -52,6 +53,17 @@ public interface MagnaTool {
     default BlockProcessor getProcessor(World world, PlayerEntity player, BlockPos pos, ItemStack heldStack) {
         return (tool, input) -> input;
     }
+    
+    default boolean isBlockValidForBreaking(BlockState blockState, ItemStack stack) {
+        if (stack.isEffectiveOn(blockState)) {
+            return true;
+        }
+        if (blockState.isToolRequired()) {
+            return false;
+        }
+    
+        return stack.getMiningSpeedMultiplier(blockState) > 1.0F;
+    }
 
     /**
      * Provides simple functionality for tools attempting to break blocks in a certain radius.
@@ -71,28 +83,18 @@ public interface MagnaTool {
         }
 
         // calculate initial hardness & get current breaking stack
-        float originHardness = world.getBlockState(pos).getHardness(world, pos);
         ItemStack mainHandStack = player.getMainHandStack();
 
         // only do a 3x3 break if the player's tool is effective on the block they are breaking
         // this makes it so breaking gravel doesn't break nearby stone
-        if (mainHandStack.isEffectiveOn(world.getBlockState(pos))) {
+        if (isBlockValidForBreaking(world.getBlockState(pos), mainHandStack)) {
             int radius = ToolRadiusCallback.EVENT.invoker().getRadius(mainHandStack, breakRadius);
 
             // break blocks
-            BlockBreaker.breakInRadius(world, player, radius, (breakState) -> {
-                double hardness = breakState.getHardness(null, null);
-
-                // special-case infested blocks for mining
-                boolean isEffective = mainHandStack.isEffectiveOn(breakState) || breakState.getBlock() instanceof InfestedBlock;
-
-                // ensure hardness is within reasonable bounds of the original hardness, and is over 0 (unless the state is an infested block, special case)
-                boolean verifyHardness = hardness < originHardness * 5 && (breakState.getBlock() instanceof InfestedBlock || hardness > 0);
-
-                return isEffective && verifyHardness;
-            }, processor, true);
+            BlockBreaker.breakInRadius(world, player, radius, (breakState) -> isBlockValidForBreaking(breakState, mainHandStack), processor, true);
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

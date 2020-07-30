@@ -2,6 +2,7 @@ package draylar.magna.api;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -47,7 +48,8 @@ public class BlockBreaker {
                         BlockPos offsetPos = new BlockPos(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 
                         // obtain dropped stacks for the given block
-                        List<ItemStack> droppedStacks = Block.getDroppedStacks(state, (ServerWorld) world, pos, null, player, player.getMainHandStack());
+                        BlockEntity blockEntity = world.getBlockState(pos).getBlock().hasBlockEntity() ? world.getBlockEntity(pos) : null;
+                        List<ItemStack> droppedStacks = Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, player.getMainHandStack());
                         List<ItemStack> processed = new ArrayList<>();
 
                         // attempt to process stack for mechanics like autosmelt
