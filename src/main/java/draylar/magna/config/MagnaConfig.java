@@ -14,6 +14,9 @@ public class MagnaConfig implements ConfigData {
 
     @Comment(value = "Whether extended hitboxes should be enabled for the appropriate tools.")
     public boolean enableExtendedHitbox = true;
+    
+    @Comment(value = "Whether block breaking should show animation on all blocks.")
+    public boolean enableAllBlockBreakingAnimation = true;
 
     @Comment(value = "Whether extended hitboxes should be disabled when the player is sneaking.")
     public boolean disableExtendedHitboxWhileSneaking = true;

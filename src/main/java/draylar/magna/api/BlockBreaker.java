@@ -7,6 +7,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.stat.Stats;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -40,8 +41,11 @@ public class BlockBreaker {
 
                 // ensure the tool or mechanic can break the given state
                 if(breakValidator.canBreak(world, pos) && !state.isAir()) {
-                    world.breakBlock(pos, false, player);
                     state.getBlock().onBreak(world, pos, state, player);
+                    boolean bl = world.removeBlock(pos, false);
+                    if (bl) {
+                        state.getBlock().onBroken(world, pos, state);
+                    }
 
                     // only drop items in creative
                     if(!player.isCreative()) {
@@ -58,10 +62,16 @@ public class BlockBreaker {
                         // drop items
                         dropItems(world, processed, offsetPos);
                         state.onStacksDropped(world, pos, player.getMainHandStack());
-                    }
-
-                    if (damageTool) {
-                        player.inventory.getMainHandStack().damage(1, player, predicatePlayer -> { });
+    
+                        if (damageTool) {
+                            ItemStack itemStack = player.getMainHandStack();
+                            boolean usingEffectiveTool = player.isUsingEffectiveTool(state);
+                            itemStack.postMine(world, state, pos, player);
+                            if (bl && usingEffectiveTool) {
+                                player.incrementStat(Stats.MINED.getOrCreateStat(state.getBlock()));
+                                player.addExhaustion(0.005F);
+                            }
+                        }
                     }
                 }
             }

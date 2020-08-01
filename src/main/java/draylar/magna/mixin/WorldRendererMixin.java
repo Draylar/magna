@@ -1,14 +1,21 @@
 package draylar.magna.mixin;
 
+import com.google.common.collect.Sets;
 import draylar.magna.Magna;
 import draylar.magna.api.BlockBreaker;
 import draylar.magna.api.MagnaTool;
 import draylar.magna.api.event.ToolRadiusCallback;
 import draylar.magna.config.MagnaConfig;
+import draylar.magna.impl.AppendedObjectIterator;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,12 +29,15 @@ import net.minecraft.util.shape.VoxelShapes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 @Mixin(WorldRenderer.class)
 @Environment(EnvType.CLIENT)
@@ -50,7 +60,9 @@ public class WorldRendererMixin {
                                                  float j) { }
 
     @Shadow private ClientWorld world;
-
+    
+    @Shadow @Final private Long2ObjectMap<SortedSet<BlockBreakingInfo>> blockBreakingProgressions;
+    
     @Inject(at = @At("HEAD"), method = "drawBlockOutline", cancellable = true)
     private void drawBlockOutline(MatrixStack stack, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
         MagnaConfig config = Magna.CONFIG;
@@ -130,5 +142,43 @@ public class WorldRendererMixin {
                 }
             }
         }
+    }
+    
+    @ModifyVariable(method = "render",
+                    at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;iterator()Lit/unimi/dsi/fastutil/objects/ObjectIterator;",
+                             shift = At.Shift.BY, by = 2), ordinal = 0)
+    private ObjectIterator<Long2ObjectMap.Entry<SortedSet<BlockBreakingInfo>>> appendBlockBreakingProgressions(ObjectIterator<Long2ObjectMap.Entry<SortedSet<BlockBreakingInfo>>> originalIterator) {
+        return new AppendedObjectIterator<>(originalIterator, getCurrentExtraBreakingInfos());
+    }
+    
+    @Unique
+    private Long2ObjectMap<SortedSet<BlockBreakingInfo>> getCurrentExtraBreakingInfos() {
+        MagnaConfig config = Magna.CONFIG;
+        
+        ItemStack heldStack = this.client.player.inventory.getMainHandStack();
+        if (heldStack.getItem() instanceof MagnaTool && config.enableAllBlockBreakingAnimation) {
+            if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
+                BlockHitResult crosshairTarget = (BlockHitResult) client.crosshairTarget;
+                BlockPos crosshairPos = crosshairTarget.getBlockPos();
+        
+                SortedSet<BlockBreakingInfo> infos = this.blockBreakingProgressions.get(crosshairPos.asLong());
+                if (infos != null && !infos.isEmpty()) {
+                    BlockBreakingInfo breakingInfo = infos.last();
+                    int stage = breakingInfo.getStage();
+    
+                    int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
+                    List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
+                    Long2ObjectMap<SortedSet<BlockBreakingInfo>> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
+                    for (BlockPos position : positions) {
+                        BlockBreakingInfo info = new BlockBreakingInfo(breakingInfo.hashCode(), position);
+                        info.setStage(stage);
+                        map.computeIfAbsent(position.asLong(), l -> Sets.newTreeSet()).add(info);
+                    }
+                    return map;
+                }
+            }
+        }
+        
+        return Long2ObjectMaps.emptyMap();
     }
 }
