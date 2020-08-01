@@ -1,6 +1,5 @@
 package draylar.magna.mixin;
 
-import com.google.common.collect.Sets;
 import draylar.magna.Magna;
 import draylar.magna.api.BlockBreaker;
 import draylar.magna.api.MagnaTool;
@@ -152,7 +151,7 @@ public class WorldRendererMixin {
     }
     
     @Unique
-    private Long2ObjectMap<SortedSet<BlockBreakingInfo>> getCurrentExtraBreakingInfos() {
+    private Long2ObjectMap<BlockBreakingInfo> getCurrentExtraBreakingInfos() {
         MagnaConfig config = Magna.CONFIG;
         
         ItemStack heldStack = this.client.player.inventory.getMainHandStack();
@@ -168,11 +167,11 @@ public class WorldRendererMixin {
     
                     int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
                     List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
-                    Long2ObjectMap<SortedSet<BlockBreakingInfo>> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
+                    Long2ObjectMap<BlockBreakingInfo> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
                     for (BlockPos position : positions) {
                         BlockBreakingInfo info = new BlockBreakingInfo(breakingInfo.hashCode(), position);
                         info.setStage(stage);
-                        map.computeIfAbsent(position.asLong(), l -> Sets.newTreeSet()).add(info);
+                        map.put(position.asLong(), info);
                     }
                     return map;
                 }
