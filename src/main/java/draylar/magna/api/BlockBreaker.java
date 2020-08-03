@@ -38,6 +38,7 @@ public class BlockBreaker {
             List<BlockPos> brokenBlocks = findPositions(world, player, radius);
             for(BlockPos pos : brokenBlocks) {
                 BlockState state = world.getBlockState(pos);
+                BlockEntity blockEntity = world.getBlockState(pos).getBlock().hasBlockEntity() ? world.getBlockEntity(pos) : null;
 
                 // ensure the tool or mechanic can break the given state
                 if(breakValidator.canBreak(world, pos) && !state.isAir()) {
@@ -52,7 +53,6 @@ public class BlockBreaker {
                         BlockPos offsetPos = new BlockPos(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 
                         // obtain dropped stacks for the given block
-                        BlockEntity blockEntity = world.getBlockState(pos).getBlock().hasBlockEntity() ? world.getBlockEntity(pos) : null;
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, player.getMainHandStack());
                         List<ItemStack> processed = new ArrayList<>();
 
