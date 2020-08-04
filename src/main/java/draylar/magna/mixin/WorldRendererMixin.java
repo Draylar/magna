@@ -22,6 +22,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -157,23 +158,25 @@ public class WorldRendererMixin {
         ItemStack heldStack = this.client.player.inventory.getMainHandStack();
         if (heldStack.getItem() instanceof MagnaTool && config.enableAllBlockBreakingAnimation) {
             if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
-                BlockHitResult crosshairTarget = (BlockHitResult) client.crosshairTarget;
-                BlockPos crosshairPos = crosshairTarget.getBlockPos();
-        
-                SortedSet<BlockBreakingInfo> infos = this.blockBreakingProgressions.get(crosshairPos.asLong());
-                if (infos != null && !infos.isEmpty()) {
-                    BlockBreakingInfo breakingInfo = infos.last();
-                    int stage = breakingInfo.getStage();
+                HitResult crosshairTarget = client.crosshairTarget;
+                if (crosshairTarget instanceof BlockHitResult) {
+                    BlockPos crosshairPos = ((BlockHitResult) crosshairTarget).getBlockPos();
     
-                    int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
-                    List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
-                    Long2ObjectMap<BlockBreakingInfo> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
-                    for (BlockPos position : positions) {
-                        BlockBreakingInfo info = new BlockBreakingInfo(breakingInfo.hashCode(), position);
-                        info.setStage(stage);
-                        map.put(position.asLong(), info);
+                    SortedSet<BlockBreakingInfo> infos = this.blockBreakingProgressions.get(crosshairPos.asLong());
+                    if (infos != null && !infos.isEmpty()) {
+                        BlockBreakingInfo breakingInfo = infos.last();
+                        int stage = breakingInfo.getStage();
+        
+                        int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
+                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
+                        Long2ObjectMap<BlockBreakingInfo> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
+                        for (BlockPos position : positions) {
+                            BlockBreakingInfo info = new BlockBreakingInfo(breakingInfo.hashCode(), position);
+                            info.setStage(stage);
+                            map.put(position.asLong(), info);
+                        }
+                        return map;
                     }
-                    return map;
                 }
             }
         }
