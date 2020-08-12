@@ -52,7 +52,7 @@ public abstract class BlockMixin {
             });
 
             // cancel
-            state.onStacksDropped(world, pos, tool);
+            state.onStacksDropped((ServerWorld) world, pos, tool);
             ci.cancel();
         }
     }
