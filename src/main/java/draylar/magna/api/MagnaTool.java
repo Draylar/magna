@@ -53,15 +53,28 @@ public interface MagnaTool {
     default BlockProcessor getProcessor(World world, PlayerEntity player, BlockPos pos, ItemStack heldStack) {
         return (tool, input) -> input;
     }
-    
+
+    /**
+     * Returns whether the block at the given position in the given world is a valid breaking target for this tool.
+     * <p>
+     * Whether a block is valid for breaking is a rough definition of effectiveness mixed with speed and tool requirements.
+     *
+     * @param view   world to look in
+     * @param pos    position to look at
+     * @param stack  stack to try to break with
+     * @return       whether the stack is roughly effective on the given location
+     */
     default boolean isBlockValidForBreaking(BlockView view, BlockPos pos, ItemStack stack) {
         BlockState blockState = view.getBlockState(pos);
+
         if (blockState.getHardness(view, pos) == -1.0) {
             return false;
         }
+
         if (stack.isEffectiveOn(blockState)) {
             return true;
         }
+
         if (blockState.isToolRequired()) {
             return false;
         }

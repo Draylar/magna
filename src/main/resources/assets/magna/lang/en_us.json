@@ -2,6 +2,7 @@
   "text.autoconfig.magna.option.highlightAirBlocks": "Whether an extended hitbox should show air blocks (or other blocks without hitboxes).",
   "text.autoconfig.magna.option.fullBlockShapes": "Whether non-full blocks (stairs, slabs) should be represented by a full cube in extended hitboxes.",
   "text.autoconfig.magna.option.enableExtendedHitbox": "Whether extended hitboxes should be enabled for the appropriate tools.",
+  "text.autoconfig.magna.option.enableAllBlockBreakingAnimation": "Whether block breaking should show animation on all blocks.",
   "text.autoconfig.magna.option.disableExtendedHitboxWhileSneaking": "Whether extended hitboxes should be disabled when the player is sneaking.",
   "text.autoconfig.magna.option.breakSingleBlockWhenSneaking": "Whether only a single block should be disabled when the player is sneaking.",
   "text.autoconfig.magna.option.individualBlockOutlines": "Whether each block in an extended hitbox should show its outline separately.",

@@ -24,6 +24,7 @@ public class Magna implements ModInitializer {
                     new Identifier("magna", "test"),
                     new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
             );
+
             Registry.register(
                     Registry.ITEM,
                     new Identifier("magna", "test2"),

@@ -80,6 +80,7 @@ public class WorldRendererMixin {
         // show extended outline if the player is holding a magna tool
         ItemStack heldStack = this.client.player.inventory.getMainHandStack();
         if (heldStack.getItem() instanceof MagnaTool && config.enableExtendedHitbox) {
+            MagnaTool tool = (MagnaTool) heldStack.getItem();
 
             // do not show extended outline if player is sneaking and the config option is enabled
             if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
@@ -99,6 +100,10 @@ public class WorldRendererMixin {
 
                         // assemble outline shape
                         for (BlockPos position : positions) {
+                            if(!tool.isBlockValidForBreaking(world, position, heldStack)) {
+                                continue;
+                            }
+
                             BlockPos diffPos = position.subtract(crosshairPos);
                             BlockState offsetShape = world.getBlockState(position);
 
@@ -153,28 +158,43 @@ public class WorldRendererMixin {
     
     @Unique
     private Long2ObjectMap<BlockBreakingInfo> getCurrentExtraBreakingInfos() {
+        assert client.player != null;
+
         MagnaConfig config = Magna.CONFIG;
-        
         ItemStack heldStack = this.client.player.inventory.getMainHandStack();
+
+        // make sure we should display the outline based on the tool
         if (heldStack.getItem() instanceof MagnaTool && config.enableAllBlockBreakingAnimation) {
+            MagnaTool tool = (MagnaTool) heldStack.getItem();
+
+            // check if we should display the outline based on config and sneaking
             if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
                 HitResult crosshairTarget = client.crosshairTarget;
+
+                // ensure we're not displaying an outline on a creeper or air
                 if (crosshairTarget instanceof BlockHitResult) {
                     BlockPos crosshairPos = ((BlockHitResult) crosshairTarget).getBlockPos();
-    
                     SortedSet<BlockBreakingInfo> infos = this.blockBreakingProgressions.get(crosshairPos.asLong());
+
+                    // make sure current block breaking progress is valid
                     if (infos != null && !infos.isEmpty()) {
                         BlockBreakingInfo breakingInfo = infos.last();
                         int stage = breakingInfo.getStage();
-        
                         int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
+
+                        // collect positions for displaying outlines at
                         List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
                         Long2ObjectMap<BlockBreakingInfo> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
+
+                        // filter positions
                         for (BlockPos position : positions) {
-                            BlockBreakingInfo info = new BlockBreakingInfo(breakingInfo.hashCode(), position);
-                            info.setStage(stage);
-                            map.put(position.asLong(), info);
+                            if(tool.isBlockValidForBreaking(world, position, heldStack)) {
+                                BlockBreakingInfo info = new BlockBreakingInfo(breakingInfo.hashCode(), position);
+                                info.setStage(stage);
+                                map.put(position.asLong(), info);
+                            }
                         }
+
                         return map;
                     }
                 }
