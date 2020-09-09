@@ -24,6 +24,7 @@
   "mixins": [
     "magna.mixins.json"
   ],
+  "accessWidener": "magna.accessWidener",
   "depends": {
     "fabricloader": ">=0.8.9+build.203",
     "fabric": "*"
