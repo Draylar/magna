@@ -92,7 +92,7 @@ public class WorldRendererMixin {
                     BlockState crosshairState = client.world.getBlockState(crosshairPos);
 
                     // ensure we are not looking at air or an invalid block
-                    if (!crosshairState.isAir() && client.world.getWorldBorder().contains(crosshairPos)) {
+                    if (!crosshairState.isAir() && client.world.getWorldBorder().contains(crosshairPos) && tool.isBlockValidForBreaking(world, crosshairPos, heldStack)) {
                         int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
                         List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
                         List<VoxelShape> outlineShapes = new ArrayList<>();
@@ -177,7 +177,7 @@ public class WorldRendererMixin {
                     SortedSet<BlockBreakingInfo> infos = this.blockBreakingProgressions.get(crosshairPos.asLong());
 
                     // make sure current block breaking progress is valid
-                    if (infos != null && !infos.isEmpty()) {
+                    if (infos != null && !infos.isEmpty() && tool.isBlockValidForBreaking(world, crosshairPos, heldStack)) {
                         BlockBreakingInfo breakingInfo = infos.last();
                         int stage = breakingInfo.getStage();
                         int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
