@@ -48,17 +48,6 @@ public class WorldRendererMixin {
     @Shadow private double lastCameraY;
     @Shadow private double lastCameraZ;
 
-    @Shadow private static void drawShapeOutline(MatrixStack matrixStack,
-                                                 VertexConsumer vertexConsumer,
-                                                 VoxelShape voxelShape,
-                                                 double d,
-                                                 double e,
-                                                 double f,
-                                                 float g,
-                                                 float h,
-                                                 float i,
-                                                 float j) { }
-
     @Shadow private ClientWorld world;
     
     @Shadow @Final private Long2ObjectMap<SortedSet<BlockBreakingInfo>> blockBreakingProgressions;
@@ -128,7 +117,7 @@ public class WorldRendererMixin {
 
                         outlineShapes.forEach(shape -> {
                             // draw extended hitbox
-                            drawShapeOutline(
+                            WorldRenderer.drawShapeOutline(
                                     stack,
                                     vertexConsumer,
                                     shape,
