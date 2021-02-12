@@ -26,4 +26,7 @@ public class MagnaConfig implements ConfigData {
 
     @Comment(value = "Whether each block in an extended hitbox should show its outline separately.")
     public boolean individualBlockOutlines = false;
+
+    @Comment(value = "Auto picks up items instead of dropping on the ground.")
+    public boolean autoPickup = false;
 }

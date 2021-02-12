@@ -1,11 +1,14 @@
 package draylar.magna.api;
 
+import draylar.magna.Magna;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.hit.BlockHitResult;
@@ -13,7 +16,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -34,6 +37,8 @@ public class BlockBreaker {
      */
     public static void breakInRadius(World world, PlayerEntity player, int radius, BreakValidator breakValidator, BlockProcessor smelter, boolean damageTool) {
         if(!world.isClient) {
+            ServerPlayerInteractionManager interactionManager = ((ServerPlayerEntity) player).interactionManager;
+            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).setMining(true);
             // collect all potential blocks to break and attempt to break them
             List<BlockPos> brokenBlocks = findPositions(world, player, radius);
             for(BlockPos pos : brokenBlocks) {
@@ -43,10 +48,12 @@ public class BlockBreaker {
                 // ensure the tool or mechanic can break the given state
                 if(breakValidator.canBreak(world, pos) && !state.isAir()) {
                     state.getBlock().onBreak(world, pos, state, player);
+                    if (!interactionManager.tryBreakBlock(pos)) continue;
                     boolean bl = world.removeBlock(pos, false);
                     if (bl) {
                         state.getBlock().onBroken(world, pos, state);
                     }
+
 
                     // only drop items in creative
                     if(!player.isCreative()) {
@@ -60,7 +67,7 @@ public class BlockBreaker {
                         droppedStacks.forEach(stack -> processed.add(smelter.process(player.inventory.getMainHandStack(), stack)));
 
                         // drop items
-                        dropItems(world, processed, offsetPos);
+                        dropItems(player, world, processed, offsetPos);
                         state.onStacksDropped((ServerWorld) world, pos, player.getMainHandStack());
     
                         if (damageTool) {
@@ -75,6 +82,7 @@ public class BlockBreaker {
                     }
                 }
             }
+            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).setMining(false);
         }
     }
 
@@ -85,10 +93,14 @@ public class BlockBreaker {
      * @param stacks  list of {@link ItemStack}s to drop in the world
      * @param pos     position to drop items at
      */
-    private static void dropItems(World world, List<ItemStack> stacks, BlockPos pos) {
+    private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, BlockPos pos) {
         for(ItemStack stack : stacks) {
-            ItemEntity itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
-            world.spawnEntity(itemEntity);
+            if (Magna.CONFIG.autoPickup)
+                player.inventory.insertStack(stack);
+            if (!stack.isEmpty()) {
+                ItemEntity itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                world.spawnEntity(itemEntity);
+            }
         }
     }
 
@@ -109,7 +121,7 @@ public class BlockBreaker {
         Vec3d combined = cameraPos.add(rotation.x * 5, rotation.y * 5, rotation.z * 5);
 
         // find block the player is currently looking at
-        BlockHitResult blockHitResult = world.rayTrace(new RayTraceContext(cameraPos, combined, RayTraceContext.ShapeType.OUTLINE, RayTraceContext.FluidHandling.NONE, playerEntity));
+        BlockHitResult blockHitResult = world.raycast(new RaycastContext(cameraPos, combined, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, playerEntity));
 
         // only show an extended hitbox if the player is looking at a block
         if (blockHitResult.getType() == HitResult.Type.BLOCK) {
