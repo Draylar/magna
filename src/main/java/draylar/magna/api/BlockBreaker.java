@@ -1,6 +1,7 @@
 package draylar.magna.api;
 
 import draylar.magna.Magna;
+import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -38,7 +39,8 @@ public class BlockBreaker {
     public static void breakInRadius(World world, PlayerEntity player, int radius, BreakValidator breakValidator, BlockProcessor smelter, boolean damageTool) {
         if(!world.isClient) {
             ServerPlayerInteractionManager interactionManager = ((ServerPlayerEntity) player).interactionManager;
-            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).setMining(true);
+            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).magna_setMining(true);
+
             // collect all potential blocks to break and attempt to break them
             List<BlockPos> brokenBlocks = findPositions(world, player, radius);
             for(BlockPos pos : brokenBlocks) {
@@ -48,12 +50,9 @@ public class BlockBreaker {
                 // ensure the tool or mechanic can break the given state
                 if(breakValidator.canBreak(world, pos) && !state.isAir()) {
                     state.getBlock().onBreak(world, pos, state, player);
-                    if (!interactionManager.tryBreakBlock(pos)) continue;
-                    boolean bl = world.removeBlock(pos, false);
-                    if (bl) {
-                        state.getBlock().onBroken(world, pos, state);
+                    if (!interactionManager.tryBreakBlock(pos)) {
+                        continue;
                     }
-
 
                     // only drop items in creative
                     if(!player.isCreative()) {
@@ -74,7 +73,7 @@ public class BlockBreaker {
                             ItemStack itemStack = player.getMainHandStack();
                             boolean usingEffectiveTool = player.isUsingEffectiveTool(state);
                             itemStack.postMine(world, state, pos, player);
-                            if (bl && usingEffectiveTool) {
+                            if (usingEffectiveTool) {
                                 player.incrementStat(Stats.MINED.getOrCreateStat(state.getBlock()));
                                 player.addExhaustion(0.005F);
                             }
@@ -82,7 +81,7 @@ public class BlockBreaker {
                     }
                 }
             }
-            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).setMining(false);
+            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).magna_setMining(false);
         }
     }
 
@@ -95,8 +94,11 @@ public class BlockBreaker {
      */
     private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, BlockPos pos) {
         for(ItemStack stack : stacks) {
-            if (Magna.CONFIG.autoPickup)
+            if (Magna.CONFIG.autoPickup) {
                 player.inventory.insertStack(stack);
+            }
+
+            // The stack passed in to insertStack is mutated, so we can still operate on it here without worrying about duplicated items.
             if (!stack.isEmpty()) {
                 ItemEntity itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
                 world.spawnEntity(itemEntity);

@@ -28,7 +28,7 @@ public class Magna implements ModInitializer {
             Registry.register(
                     Registry.ITEM,
                     new Identifier("magna", "test2"),
-                    new ExcavatorItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
+                    new ExcavatorItem(ToolMaterials.WOOD, 0, 0, new Item.Settings())
             );
         }
     }

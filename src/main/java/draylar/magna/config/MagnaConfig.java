@@ -1,8 +1,8 @@
 package draylar.magna.config;
 
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = "magna")
 public class MagnaConfig implements ConfigData {
@@ -27,6 +27,6 @@ public class MagnaConfig implements ConfigData {
     @Comment(value = "Whether each block in an extended hitbox should show its outline separately.")
     public boolean individualBlockOutlines = false;
 
-    @Comment(value = "Auto picks up items instead of dropping on the ground.")
+    @Comment(value = "If true, dropped items are automatically inserted into the inventory.")
     public boolean autoPickup = false;
 }
