@@ -1,5 +1,6 @@
 package draylar.magna.api;
 
+import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import draylar.magna.Magna;
 import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
 import net.minecraft.block.Block;
@@ -38,6 +39,8 @@ public class BlockBreaker {
      */
     public static void breakInRadius(World world, PlayerEntity player, int radius, BreakValidator breakValidator, BlockProcessor smelter, boolean damageTool) {
         if(!world.isClient) {
+            // Flag ServerPlayerInteractionManager as saying we are now breaking in Hammer context.
+            // See the large block of comments down below for a more in-depth explanation.
             ServerPlayerInteractionManager interactionManager = ((ServerPlayerEntity) player).interactionManager;
             ((MagnaPlayerInteractionManagerExtension) (interactionManager)).magna_setMining(true);
 
@@ -54,9 +57,21 @@ public class BlockBreaker {
                         continue;
                     }
 
+                    // The following check is wacky. To start, a Hammer breaking a block is redirected
+                    //   into a 3x3 break by ServerPlayerInteractionManagerMixin. At the same time,
+                    //   we want to ensure all 3x3 are valid breaks (for things like callbacks or claim protection),
+                    //   so we again check tryBreakBlock for validity. To avoid recursively breaking blocks,
+                    //   and to cancel the actual block broken logic / item drops, ServerPlayerInteractionManagerMixin
+                    //   checks a flag set at the top of this method.
+                    // In other words: if this part is reached, only the first 50% of tryBreakBlock was called, and it is a valid break.
+                    boolean bl = world.removeBlock(pos, false);
+                    if (bl) {
+                        state.getBlock().onBroken(world, pos, state);
+                    }
+
                     // only drop items in creative
                     if(!player.isCreative()) {
-                        BlockPos offsetPos = new BlockPos(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+                        Vec3d offsetPos = new Vec3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
 
                         // obtain dropped stacks for the given block
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, player.getMainHandStack());
@@ -92,13 +107,13 @@ public class BlockBreaker {
      * @param stacks  list of {@link ItemStack}s to drop in the world
      * @param pos     position to drop items at
      */
-    private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, BlockPos pos) {
+    private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, Vec3d pos) {
         for(ItemStack stack : stacks) {
             if (Magna.CONFIG.autoPickup) {
                 player.inventory.insertStack(stack);
             }
 
-            // The stack passed in to insertStack is mutated, so we can still operate on it here without worrying about duplicated items.
+            // The stack passed in to insertStack is mutated, so we can operate on it here without worrying about duplicated items.
             if (!stack.isEmpty()) {
                 ItemEntity itemEntity = new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), stack);
                 world.spawnEntity(itemEntity);
@@ -120,7 +135,8 @@ public class BlockBreaker {
         // collect information on camera
         Vec3d cameraPos = playerEntity.getCameraPosVec(1);
         Vec3d rotation = playerEntity.getRotationVec(1);
-        Vec3d combined = cameraPos.add(rotation.x * 5, rotation.y * 5, rotation.z * 5);
+        double reachDistance = ReachEntityAttributes.getReachDistance(playerEntity, 5);
+        Vec3d combined = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
 
         // find block the player is currently looking at
         BlockHitResult blockHitResult = world.raycast(new RaycastContext(cameraPos, combined, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, playerEntity));
