@@ -2,6 +2,7 @@ package draylar.magna.api;
 
 import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import draylar.magna.Magna;
+import draylar.magna.api.reach.ReachDistanceHelper;
 import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -160,7 +161,7 @@ public class BlockBreaker {
         // collect information on camera
         Vec3d cameraPos = playerEntity.getCameraPosVec(1);
         Vec3d rotation = playerEntity.getRotationVec(1);
-        double reachDistance = ReachEntityAttributes.getReachDistance(playerEntity, 5);
+        double reachDistance = ReachDistanceHelper.getReachDistance(playerEntity);
         Vec3d combined = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
 
         // find block the player is currently looking at

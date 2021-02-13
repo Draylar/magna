@@ -13,7 +13,10 @@ public class Magna implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        if(FabricLoader.getInstance().isDevelopmentEnvironment()) {
+        // Before loading the test suite, ensure:
+        //   1. this is a development environment
+        //   2. REA is installed, which signals this is probably the Magna workspace (REA is also required for testing)
+        if(FabricLoader.getInstance().isDevelopmentEnvironment() && FabricLoader.getInstance().isModLoaded("reach-entity-attributes")) {
             MagnaTest.initialize();
         }
     }
