@@ -35,6 +35,20 @@ public interface MagnaTool {
     int getRadius(ItemStack stack);
 
     /**
+     * Returns the depth of this {@link MagnaTool}.
+     * <p>
+     * Unlike radius, which defines the number of perpendicular blocks broken, around a central point, to the player,
+     *   depth is how far back it goes. A depth of 0 (default) means a single layer is broken, while a depth of 3 with a
+     *   radius of 3 represents a 3x3 cube with the origin 1 block away from the central block being broken.
+     *
+     * @param stack   current {@link MagnaTool} stack being used
+     * @return        breaking depth of stack
+     */
+    default int getDepth(ItemStack stack) {
+        return 0;
+    }
+
+    /**
      * @return whether or not this {@link MagnaTool} should run sound/particle effects when neighboring blocks are broken.
      */
     boolean playBreakEffects();
@@ -106,9 +120,10 @@ public interface MagnaTool {
         // this makes it so breaking gravel doesn't break nearby stone
         if (isBlockValidForBreaking(world, pos, mainHandStack)) {
             int radius = ToolRadiusCallback.EVENT.invoker().getRadius(mainHandStack, breakRadius);
+            int depth = getDepth(mainHandStack);
 
             // break blocks
-            BlockBreaker.breakInRadius(world, player, radius, (view, breakPos) -> isBlockValidForBreaking(view, breakPos, mainHandStack), processor, true);
+            BlockBreaker.breakInRadius(world, player, radius, depth, (view, breakPos) -> isBlockValidForBreaking(view, breakPos, mainHandStack), processor, true);
             return true;
         }
 
