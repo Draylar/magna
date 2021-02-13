@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.4.30'
+    id 'fabric-loom' version '0.5-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -16,6 +16,7 @@ minecraft {
 
 repositories {
     maven { url "https://maven.shedaniel.me/" }
+    maven {url "https://maven.jamieswhiteshirt.com/libs-release/"}
 }
 
 dependencies {
@@ -32,6 +33,9 @@ dependencies {
 
     // dev modmenu
     modCompile "io.github.prospector:modmenu:${project.mod_menu_version}"
+
+    // dev Reach Entity Attributes for testing tools with extended reach (or players)
+    modImplementation "com.jamieswhiteshirt:reach-entity-attributes:1.0.1"
 }
 
 processResources {
