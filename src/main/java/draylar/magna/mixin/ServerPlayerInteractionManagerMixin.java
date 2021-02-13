@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// This class has a lower priority than default so it runs after claim mods/FAPI checks for block breaking validity.
 @Mixin(value = ServerPlayerInteractionManager.class, priority = 1001)
 public class ServerPlayerInteractionManagerMixin implements MagnaPlayerInteractionManagerExtension {
 
