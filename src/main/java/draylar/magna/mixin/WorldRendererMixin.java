@@ -83,7 +83,7 @@ public class WorldRendererMixin {
                     // ensure we are not looking at air or an invalid block
                     if (!crosshairState.isAir() && client.world.getWorldBorder().contains(crosshairPos) && tool.isBlockValidForBreaking(world, crosshairPos, heldStack)) {
                         int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
-                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
+                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius, tool.getDepth(heldStack));
                         List<VoxelShape> outlineShapes = new ArrayList<>();
                         outlineShapes.add(VoxelShapes.empty());
 
@@ -172,7 +172,7 @@ public class WorldRendererMixin {
                         int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
 
                         // collect positions for displaying outlines at
-                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius);
+                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius, tool.getDepth(heldStack));
                         Long2ObjectMap<BlockBreakingInfo> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
 
                         // filter positions

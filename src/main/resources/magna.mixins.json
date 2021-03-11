@@ -4,13 +4,13 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "BlockMixin",
-    "MiningToolItemAccessor",
     "PlayerInventoryMixin",
     "ServerPlayerInteractionManagerMixin",
     "WorldMixin"
   ],
   "client": [
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "ClientPlayerInteractionManagerMixin",
   ],
   "injectors": {
     "defaultRequire": 1
