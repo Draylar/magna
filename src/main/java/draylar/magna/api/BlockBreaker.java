@@ -1,6 +1,5 @@
 package draylar.magna.api;
 
-import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import draylar.magna.Magna;
 import draylar.magna.api.reach.ReachDistanceHelper;
 import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
@@ -9,11 +8,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -182,6 +183,12 @@ public class BlockBreaker {
             }
 
             BlockPos origin = blockHitResult.getBlockPos();
+
+            ItemStack handStack = playerEntity.getStackInHand(Hand.MAIN_HAND);
+            Item item = handStack.getItem();
+            if (item instanceof MagnaTool) {
+                origin = ((MagnaTool) item).getCenterPosition(world, playerEntity, origin, handStack);
+            }
 
             // check if each position inside the box is valid
             for(BlockPos pos : positions) {

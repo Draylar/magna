@@ -54,6 +54,21 @@ public interface MagnaTool {
     boolean playBreakEffects();
 
     /**
+     * Modifies which block will be considered the center of the radius.
+     * <p>
+     * This is useful for tools with a big radius to avoid breaking blocks under the player.
+     *
+     * @param world      world the block is breaking
+     * @param player     player that is breaking
+     * @param pos        position of the mined block
+     * @param toolStack  {@link MagnaTool} currently being held by the player
+     * @return           a {@link BlockPos} that will define the center of the radius
+     */
+    default BlockPos getCenterPosition(World world, PlayerEntity player, BlockPos pos, ItemStack toolStack) {
+        return pos;
+    }
+
+    /**
      * Defines behavior about how this {@link MagnaTool} should process block drops.
      * <p>
      * This is useful for mechanics such as auto-smelt or removing stacks that shouldn't be dropped while using a certain tool.
