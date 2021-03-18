@@ -5,6 +5,7 @@ import draylar.magna.api.event.ToolRadiusCallback;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -58,14 +59,14 @@ public interface MagnaTool {
      * <p>
      * This is useful for tools with a big radius to avoid breaking blocks under the player.
      *
-     * @param world      world the block is breaking
-     * @param player     player that is breaking
-     * @param pos        position of the mined block
-     * @param toolStack  {@link MagnaTool} currently being held by the player
-     * @return           a {@link BlockPos} that will define the center of the radius
+     * @param world           world the block is breaking
+     * @param player          player that is breaking
+     * @param blockHitResult  raycast result from where the player is looking to the block being mined
+     * @param toolStack       {@link MagnaTool} currently being held by the player
+     * @return                a {@link BlockPos} that will define the center of the radius
      */
-    default BlockPos getCenterPosition(World world, PlayerEntity player, BlockPos pos, ItemStack toolStack) {
-        return pos;
+    default BlockPos getCenterPosition(World world, PlayerEntity player, BlockHitResult blockHitResult, ItemStack toolStack) {
+        return blockHitResult.getBlockPos();
     }
 
     /**

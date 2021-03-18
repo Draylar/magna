@@ -187,7 +187,7 @@ public class BlockBreaker {
             ItemStack handStack = playerEntity.getStackInHand(Hand.MAIN_HAND);
             Item item = handStack.getItem();
             if (item instanceof MagnaTool) {
-                origin = ((MagnaTool) item).getCenterPosition(world, playerEntity, origin, handStack);
+                origin = ((MagnaTool) item).getCenterPosition(world, playerEntity, blockHitResult, handStack);
             }
 
             // check if each position inside the box is valid
