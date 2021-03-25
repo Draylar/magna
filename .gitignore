@@ -3,3 +3,6 @@
 /build/
 /run/
 /.idea/
+/out/
+/logs/
+/magna.iml
