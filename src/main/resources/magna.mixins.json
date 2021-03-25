@@ -10,7 +10,7 @@
   ],
   "client": [
     "WorldRendererMixin",
-    "ClientPlayerInteractionManagerMixin",
+    "ClientPlayerInteractionManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
