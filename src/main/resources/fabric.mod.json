@@ -10,6 +10,10 @@
   "contributors": [
     "GabrielOlvH"
   ],
+  "contact": {
+    "homepage": "https://github.com/Draylar/magna",
+    "issues": "https://github.com/Draylar/magna/issues"
+  },
   "license": "CC0-1.0",
   "icon": "assets/magna/icon.png",
   "environment": "*",
@@ -22,7 +26,9 @@
     ]
   },
   "custom": {
-    "modmenu:api": true
+    "modmenu": {
+      "badges": [ "library" ]
+    }
   },
   "mixins": [
     "magna.mixins.json"
