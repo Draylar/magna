@@ -3,6 +3,7 @@ package draylar.magna.api;
 import draylar.magna.Magna;
 import draylar.magna.api.reach.ReachDistanceHelper;
 import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -72,6 +73,12 @@ public class BlockBreaker {
                 if(breakValidator.canBreak(world, pos) && !state.isAir()) {
                     state.getBlock().onBreak(world, pos, state, player);
                     if (!interactionManager.tryBreakBlock(pos)) {
+                        continue;
+                    }
+
+                    // check FAPI break callback
+                    boolean result = PlayerBlockBreakEvents.BEFORE.invoker().beforeBlockBreak(world, player, pos, state, world.getBlockEntity(pos));
+                    if(!result) {
                         continue;
                     }
 
