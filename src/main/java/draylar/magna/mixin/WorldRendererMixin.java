@@ -76,6 +76,11 @@ public class WorldRendererMixin {
 
                 // only show extended outline for block raytraces
                 if (client.crosshairTarget instanceof BlockHitResult) {
+                    // if the tool should not render outlines, abort mission now
+                    if(!tool.renderOutline(world, (BlockHitResult) client.crosshairTarget, client.player, heldStack)) {
+                        return;
+                    }
+
                     BlockHitResult crosshairTarget = (BlockHitResult) client.crosshairTarget;
                     BlockPos crosshairPos = crosshairTarget.getBlockPos();
                     BlockState crosshairState = client.world.getBlockState(crosshairPos);

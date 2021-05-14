@@ -145,4 +145,19 @@ public interface MagnaTool {
 
         return false;
     }
+
+    /**
+     * Returns whether this tool should render a block outline when the player is looking at a block.
+     * <p>
+     * Returning {@code false} from this method may help client-side performance when dealing with very large tool radius sizes.
+     *
+     * @param world client-side world
+     * @param ray a {@link BlockHitResult} describing the block being looked at by the player
+     * @param player player holding the tool
+     * @param stack stack being held by the player
+     * @return {@code true} if this tool should render a block outline, otherwise {@code false}
+     */
+    default boolean renderOutline(World world, BlockHitResult ray, PlayerEntity player, ItemStack stack) {
+        return true;
+    }
 }
