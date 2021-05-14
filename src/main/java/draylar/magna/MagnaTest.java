@@ -37,7 +37,7 @@ public class MagnaTest {
 
                     @Override
                     public int getDepth(ItemStack stack) {
-                        return 1;
+                        return 5;
                     }
                 }
         );
