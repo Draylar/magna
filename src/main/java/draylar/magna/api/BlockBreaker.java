@@ -148,7 +148,7 @@ public class BlockBreaker {
             }
         }
 
-        if(!stacks.isEmpty()) {
+        if(!stacks.isEmpty() && Magna.CONFIG.autoPickup) {
             world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
         }
     }
