@@ -70,7 +70,7 @@ public class BlockBreaker {
             List<BlockPos> brokenBlocks = findPositions(world, player, radius, depth);
             for(BlockPos pos : brokenBlocks) {
                 BlockState state = world.getBlockState(pos);
-                BlockEntity blockEntity = world.getBlockState(pos).getBlock().hasBlockEntity() ? world.getBlockEntity(pos) : null;
+                BlockEntity blockEntity = world.getBlockState(pos).hasBlockEntity() ? world.getBlockEntity(pos) : null;
 
                 // ensure the tool or mechanic can break the given state
                 if(breakValidator.canBreak(world, pos) && !state.isAir()) {
@@ -106,7 +106,7 @@ public class BlockBreaker {
                         List<ItemStack> processed = new ArrayList<>();
 
                         // attempt to process stack for mechanics like autosmelt
-                        droppedStacks.forEach(stack -> processed.add(smelter.process(player.inventory.getMainHandStack(), stack)));
+                        droppedStacks.forEach(stack -> processed.add(smelter.process(player.getInventory().getMainHandStack(), stack)));
 
                         // drop items
                         dropItems(player, world, processed, offsetPos);
@@ -114,7 +114,7 @@ public class BlockBreaker {
     
                         if (damageTool) {
                             ItemStack itemStack = player.getMainHandStack();
-                            boolean usingEffectiveTool = player.isUsingEffectiveTool(state);
+                            boolean usingEffectiveTool = player.canHarvest(state);
                             itemStack.postMine(world, state, pos, player);
                             if (usingEffectiveTool) {
                                 player.incrementStat(Stats.MINED.getOrCreateStat(state.getBlock()));
@@ -138,7 +138,7 @@ public class BlockBreaker {
     private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, Vec3d pos) {
         for(ItemStack stack : stacks) {
             if (Magna.CONFIG.autoPickup) {
-                player.inventory.insertStack(stack);
+                player.getInventory().insertStack(stack);
             }
 
             // The stack passed in to insertStack is mutated, so we can operate on it here without worrying about duplicated items.

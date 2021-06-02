@@ -67,7 +67,7 @@ public class WorldRendererMixin {
         }
 
         // show extended outline if the player is holding a magna tool
-        ItemStack heldStack = this.client.player.inventory.getMainHandStack();
+        ItemStack heldStack = this.client.player.getInventory().getMainHandStack();
         if (heldStack.getItem() instanceof MagnaTool && config.enableExtendedHitbox) {
             MagnaTool tool = (MagnaTool) heldStack.getItem();
 
@@ -155,7 +155,7 @@ public class WorldRendererMixin {
         assert client.player != null;
 
         MagnaConfig config = Magna.CONFIG;
-        ItemStack heldStack = this.client.player.inventory.getMainHandStack();
+        ItemStack heldStack = this.client.player.getInventory().getMainHandStack();
 
         // make sure we should display the outline based on the tool
         if (heldStack.getItem() instanceof MagnaTool && config.enableAllBlockBreakingAnimation) {

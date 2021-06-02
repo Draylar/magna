@@ -101,7 +101,7 @@ public interface MagnaTool {
             return false;
         }
 
-        if (stack.isEffectiveOn(blockState)) {
+        if (stack.isSuitableFor(blockState)) {
             return true;
         }
 
