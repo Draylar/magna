@@ -1,7 +1,6 @@
 package draylar.magna.api;
 
 import draylar.magna.Magna;
-import draylar.magna.api.reach.ReachDistanceHelper;
 import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.Block;
@@ -9,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
@@ -17,14 +15,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -41,7 +33,7 @@ public class BlockBreaker {
      * @param player          the player using the tool to break the blocks
      * @param radius          radius to break blocks in
      * @param breakValidator  predicate to see if a block can be broken
-     * @param damageTool      whether or not the tool being used should be damaged
+     * @param damageTool      whether the tool being used should be damaged
      */
     public static void breakInRadius(World world, PlayerEntity player, int radius, BreakValidator breakValidator, BlockProcessor smelter, boolean damageTool) {
         breakInRadius(world, player, radius, 0, breakValidator, smelter, damageTool);
@@ -57,17 +49,34 @@ public class BlockBreaker {
      * @param radius          radius to break blocks in
      * @param depth           depth to break blocks in
      * @param breakValidator  predicate to see if a block can be broken
-     * @param damageTool      whether or not the tool being used should be damaged
+     * @param damageTool      whether the tool being used should be damaged
      */
     public static void breakInRadius(World world, PlayerEntity player, int radius, int depth, BreakValidator breakValidator, BlockProcessor smelter, boolean damageTool) {
+        breakInRadius(world, player, radius, depth, BlockFinder.DEFAULT, breakValidator, smelter, damageTool);
+    }
+
+    /**
+     * Breaks blocks within the given radius in the direction the {@link PlayerEntity} is facing.
+     * <p>
+     * Example: If the {@link PlayerEntity} is facing in the X axis direction and the radius is 1, a 3x3 area will be destroyed on the X axis.
+     *
+     * @param world           world to break blocks in
+     * @param player          the player using the tool to break the blocks
+     * @param radius          radius to break blocks in
+     * @param depth           depth to break blocks in
+     * @param finder          finder for valid block positions
+     * @param breakValidator  predicate to see if a block can be broken
+     * @param damageTool      whether the tool being used should be damaged
+     */
+    public static void breakInRadius(World world, PlayerEntity player, int radius, int depth, BlockFinder finder, BreakValidator breakValidator, BlockProcessor smelter, boolean damageTool) {
         if(!world.isClient) {
             // Flag ServerPlayerInteractionManager as saying we are now breaking in Hammer context.
             // See the large block of comments down below for a more in-depth explanation.
             ServerPlayerInteractionManager interactionManager = ((ServerPlayerEntity) player).interactionManager;
-            ((MagnaPlayerInteractionManagerExtension) (interactionManager)).magna_setMining(true);
+            ((MagnaPlayerInteractionManagerExtension) interactionManager).magna_setMining(true);
 
             // collect all potential blocks to break and attempt to break them
-            List<BlockPos> brokenBlocks = findPositions(world, player, radius, depth);
+            List<BlockPos> brokenBlocks = finder.findPositions(world, player, radius, depth);
             for(BlockPos pos : brokenBlocks) {
                 BlockState state = world.getBlockState(pos);
                 BlockEntity blockEntity = world.getBlockState(pos).hasBlockEntity() ? world.getBlockEntity(pos) : null;
@@ -111,7 +120,7 @@ public class BlockBreaker {
                         // drop items
                         dropItems(player, world, processed, offsetPos);
                         state.onStacksDropped((ServerWorld) world, pos, player.getMainHandStack());
-    
+
                         if (damageTool) {
                             ItemStack itemStack = player.getMainHandStack();
                             boolean usingEffectiveTool = player.canHarvest(state);
@@ -135,7 +144,7 @@ public class BlockBreaker {
      * @param stacks  list of {@link ItemStack}s to drop in the world
      * @param pos     position to drop items at
      */
-    private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, Vec3d pos) {
+   private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, Vec3d pos) {
         for(ItemStack stack : stacks) {
             if (Magna.CONFIG.autoPickup) {
                 player.getInventory().insertStack(stack);
@@ -151,95 +160,6 @@ public class BlockBreaker {
         if(!stacks.isEmpty() && Magna.CONFIG.autoPickup) {
             world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
         }
-    }
-
-    /**
-     * Returns positions with a depth of 0.
-     * @see BlockBreaker#findPositions(World, PlayerEntity, int, int)
-     */
-    public static List<BlockPos> findPositions(World world, PlayerEntity playerEntity, int radius) {
-        return findPositions(world, playerEntity, radius, 0);
-    }
-
-    /**
-     * Returns a list of {@link BlockPos} in the given radius considering the {@link PlayerEntity}'s facing direction.
-     *
-     * @param world         world to check in
-     * @param playerEntity  player that is collecting blocks
-     * @param radius        radius to collect blocks in
-     * @param depth         the depth away from the player to break
-     * @return              a list of blocks that would be broken with the given radius and tool
-     */
-    public static List<BlockPos> findPositions(World world, PlayerEntity playerEntity, int radius, int depth) {
-        ArrayList<BlockPos> potentialBrokenBlocks = new ArrayList<>();
-
-        // collect information on camera
-        Vec3d cameraPos = playerEntity.getCameraPosVec(1);
-        Vec3d rotation = playerEntity.getRotationVec(1);
-        double reachDistance = ReachDistanceHelper.getReachDistance(playerEntity);
-        Vec3d combined = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
-
-        // find block the player is currently looking at
-        BlockHitResult blockHitResult = world.raycast(new RaycastContext(cameraPos, combined, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, playerEntity));
-
-        // only show an extended hitbox if the player is looking at a block
-        if (blockHitResult.getType() == HitResult.Type.BLOCK) {
-            Direction.Axis axis = blockHitResult.getSide().getAxis();
-            ArrayList<BlockPos> positions = new ArrayList<>();
-
-            // create a box using the given radius
-            for(int x = -radius; x <= radius; x++) {
-                for(int y = -radius; y <= radius; y++) {
-                    for(int z = -radius; z <= radius; z++) {
-                        positions.add(new BlockPos(x, y, z));
-                    }
-                }
-            }
-
-            BlockPos origin = blockHitResult.getBlockPos();
-
-            ItemStack handStack = playerEntity.getStackInHand(Hand.MAIN_HAND);
-            Item item = handStack.getItem();
-            if (item instanceof MagnaTool) {
-                origin = ((MagnaTool) item).getCenterPosition(world, playerEntity, blockHitResult, handStack);
-            }
-
-            // check if each position inside the box is valid
-            for(BlockPos pos : positions) {
-                boolean valid = false;
-
-                if(axis == Direction.Axis.Y) {
-                    if(pos.getY() == 0) {
-                        potentialBrokenBlocks.add(origin.add(pos));
-                        valid = true;
-                    }
-                }
-
-                else if (axis == Direction.Axis.X) {
-                    if(pos.getX() == 0) {
-                        potentialBrokenBlocks.add(origin.add(pos));
-                        valid = true;
-                    }
-                }
-
-                else if (axis == Direction.Axis.Z) {
-                    if(pos.getZ() == 0) {
-                        potentialBrokenBlocks.add(origin.add(pos));
-                        valid = true;
-                    }
-                }
-
-                // Operate on depth by extending the current block away from the player.
-                if(valid) {
-                    for (int i = 1; i <= depth; i++) {
-                        Vec3i vec = blockHitResult.getSide().getOpposite().getVector();
-                        potentialBrokenBlocks.add(origin.add(pos).add(vec.getX() * i, vec.getY() * i, vec.getZ() * i));
-                    }
-                }
-            }
-        }
-
-        return potentialBrokenBlocks;
     }
 
     private BlockBreaker() {
