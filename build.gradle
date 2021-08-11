@@ -36,7 +36,7 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
     // dev Reach Entity Attributes for testing tools with extended reach (or players)
-    modImplementation "com.jamieswhiteshirt:reach-entity-attributes:1.0.1"
+    modImplementation "com.jamieswhiteshirt:reach-entity-attributes:${project.rea_version}"
 }
 
 processResources {
