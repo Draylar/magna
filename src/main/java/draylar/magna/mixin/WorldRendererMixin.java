@@ -1,7 +1,6 @@
 package draylar.magna.mixin;
 
 import draylar.magna.Magna;
-import draylar.magna.api.BlockBreaker;
 import draylar.magna.api.MagnaTool;
 import draylar.magna.api.event.ToolRadiusCallback;
 import draylar.magna.config.MagnaConfig;
@@ -68,27 +67,25 @@ public class WorldRendererMixin {
 
         // show extended outline if the player is holding a magna tool
         ItemStack heldStack = this.client.player.getInventory().getMainHandStack();
-        if (heldStack.getItem() instanceof MagnaTool && config.enableExtendedHitbox) {
-            MagnaTool tool = (MagnaTool) heldStack.getItem();
+        if (heldStack.getItem() instanceof MagnaTool tool && config.enableExtendedHitbox) {
 
             // do not show extended outline if player is sneaking and the config option is enabled
             if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
 
                 // only show extended outline for block raytraces
-                if (client.crosshairTarget instanceof BlockHitResult) {
+                if (client.crosshairTarget instanceof BlockHitResult crosshairTarget) {
                     // if the tool should not render outlines, abort mission now
                     if(!tool.renderOutline(world, (BlockHitResult) client.crosshairTarget, client.player, heldStack)) {
                         return;
                     }
 
-                    BlockHitResult crosshairTarget = (BlockHitResult) client.crosshairTarget;
                     BlockPos crosshairPos = crosshairTarget.getBlockPos();
                     BlockState crosshairState = client.world.getBlockState(crosshairPos);
 
                     // ensure we are not looking at air or an invalid block
                     if (!crosshairState.isAir() && client.world.getWorldBorder().contains(crosshairPos) && tool.isBlockValidForBreaking(world, crosshairPos, heldStack)) {
-                        int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
-                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius, tool.getDepth(heldStack));
+                        int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, tool.getRadius(heldStack));
+                        List<BlockPos> positions = tool.getBlockFinder().findPositions(world, client.player, radius, tool.getDepth(heldStack));
                         List<VoxelShape> outlineShapes = new ArrayList<>();
                         outlineShapes.add(VoxelShapes.empty());
 
@@ -158,8 +155,7 @@ public class WorldRendererMixin {
         ItemStack heldStack = this.client.player.getInventory().getMainHandStack();
 
         // make sure we should display the outline based on the tool
-        if (heldStack.getItem() instanceof MagnaTool && config.enableAllBlockBreakingAnimation) {
-            MagnaTool tool = (MagnaTool) heldStack.getItem();
+        if (heldStack.getItem() instanceof MagnaTool tool && config.enableAllBlockBreakingAnimation) {
 
             // check if we should display the outline based on config and sneaking
             if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
@@ -174,10 +170,10 @@ public class WorldRendererMixin {
                     if (infos != null && !infos.isEmpty() && tool.isBlockValidForBreaking(world, crosshairPos, heldStack)) {
                         BlockBreakingInfo breakingInfo = infos.last();
                         int stage = breakingInfo.getStage();
-                        int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, ((MagnaTool) heldStack.getItem()).getRadius(heldStack));
+                        int radius = ToolRadiusCallback.EVENT.invoker().getRadius(heldStack, tool.getRadius(heldStack));
 
                         // collect positions for displaying outlines at
-                        List<BlockPos> positions = BlockBreaker.findPositions(world, client.player, radius, tool.getDepth(heldStack));
+                        List<BlockPos> positions = tool.getBlockFinder().findPositions(world, client.player, radius, tool.getDepth(heldStack));
                         Long2ObjectMap<BlockBreakingInfo> map = new Long2ObjectLinkedOpenHashMap<>(positions.size());
 
                         // filter positions

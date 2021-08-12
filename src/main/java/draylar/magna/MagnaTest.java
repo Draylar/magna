@@ -3,7 +3,7 @@ package draylar.magna;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
-import draylar.magna.api.MagnaTool;
+import draylar.magna.api.BlockFinder;
 import draylar.magna.item.ExcavatorItem;
 import draylar.magna.item.HammerItem;
 import net.minecraft.entity.EquipmentSlot;
@@ -15,8 +15,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterials;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 /**
  * This class is responsible for registering development-environment test items.
@@ -84,6 +87,28 @@ public class MagnaTest {
                     @Override
                     public int getDepth(ItemStack stack) {
                         return 15;
+                    }
+                }
+        );
+
+        // Hammer that only breaks blocks inside its radius with an odd x or (exclusive) z position.
+        Registry.register(
+                Registry.ITEM,
+                new Identifier("magna", "custom_breaker_test"),
+                new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings()) {
+                    private final BlockFinder TEST_FINDER = new BlockFinder() {
+                        @Override
+                        public List<BlockPos> findPositions(World world, PlayerEntity playerEntity, int radius, int depth) {
+                            return BlockFinder.super.findPositions(world, playerEntity, radius, depth)
+                                    .stream()
+                                    .filter((pos) -> pos.getX() % 2 == 0 ^ pos.getZ() % 2 == 0)
+                                    .toList();
+                        }
+                    };
+
+                    @Override
+                    public BlockFinder getBlockFinder() {
+                        return TEST_FINDER;
                     }
                 }
         );

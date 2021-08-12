@@ -139,7 +139,7 @@ public interface MagnaTool {
             int depth = getDepth(mainHandStack);
 
             // break blocks
-            BlockBreaker.breakInRadius(world, player, radius, depth, (view, breakPos) -> isBlockValidForBreaking(view, breakPos, mainHandStack), processor, true);
+            BlockBreaker.breakInRadius(world, player, radius, depth, getBlockFinder(), (view, breakPos) -> isBlockValidForBreaking(view, breakPos, mainHandStack), processor, true);
             return true;
         }
 
@@ -159,5 +159,13 @@ public interface MagnaTool {
      */
     default boolean renderOutline(World world, BlockHitResult ray, PlayerEntity player, ItemStack stack) {
         return true;
+    }
+
+    /**
+     * Provides the {@link BlockFinder} that determines the valid positions to break.
+     * @return the {@link BlockFinder} that this tool uses
+     */
+    default BlockFinder getBlockFinder() {
+        return BlockFinder.DEFAULT;
     }
 }
