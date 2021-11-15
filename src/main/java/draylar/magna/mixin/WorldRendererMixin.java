@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.client.render.VertexConsumer;
@@ -43,14 +44,9 @@ import java.util.SortedSet;
 public class WorldRendererMixin {
 
     @Shadow @Final private MinecraftClient client;
-    @Shadow private double lastCameraX;
-    @Shadow private double lastCameraY;
-    @Shadow private double lastCameraZ;
-
     @Shadow private ClientWorld world;
-    
     @Shadow @Final private Long2ObjectMap<SortedSet<BlockBreakingInfo>> blockBreakingProgressions;
-    
+
     @Inject(at = @At("HEAD"), method = "drawBlockOutline", cancellable = true)
     private void drawBlockOutline(MatrixStack stack, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
         MagnaConfig config = Magna.CONFIG;
@@ -122,10 +118,10 @@ public class WorldRendererMixin {
                             WorldRenderer.drawShapeOutline(
                                     stack,
                                     vertexConsumer,
-                                    shape,
-                                    (double) crosshairPos.getX() - lastCameraX,
-                                    (double) crosshairPos.getY() - lastCameraY,
-                                    (double) crosshairPos.getZ() - lastCameraZ,
+                                    shape, // blockState.getOutlineShape(this.world, blockPos, ShapeContext.of(entity))
+                                    (double) crosshairPos.getX() - d,
+                                    (double) crosshairPos.getY() - e,
+                                    (double) crosshairPos.getZ() - f,
                                     0.0F,
                                     0.0F,
                                     0.0F,

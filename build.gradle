@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.8-SNAPSHOT'
+    id 'fabric-loom' version '0.10-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -10,11 +10,12 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version + "-" + project.minecraft_version
 group = project.maven_group
 
-minecraft {
-    accessWidener("src/main/resources/magna.accessWidener")
+loom {
+    accessWidenerPath = file("src/main/resources/magna.accessWidener")
 }
 
 repositories {
+    maven { url 'https://jitpack.io' }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.jamieswhiteshirt.com/libs-release/" }
     maven { url "https://maven.terraformersmc.com/releases/" }
@@ -27,10 +28,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // config
-    include("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}")
-    modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
+    modImplementation 'com.github.Draylar.omega-config:omega-config-base:1.0.8-1.17'
+    include 'com.github.Draylar.omega-config:omega-config-base:1.0.8-1.17'
 
     // dev modmenu
     modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"

@@ -1,15 +1,14 @@
 package draylar.magna;
 
 import draylar.magna.config.MagnaConfig;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
+import draylar.omegaconfig.OmegaConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
 public class Magna implements ModInitializer {
 
-    public static MagnaConfig CONFIG = AutoConfig.register(MagnaConfig.class, GsonConfigSerializer::new).getConfig();
+    public static MagnaConfig CONFIG = OmegaConfig.register(MagnaConfig.class);
 
     @Override
     public void onInitialize() {
@@ -24,8 +23,8 @@ public class Magna implements ModInitializer {
     /**
      * Returns an {@link Identifier} under the "magna" namespace.
      *
-     * @param name  path of the {@link Identifier} to return
-     * @return      {@link Identifier} with namespace of "magna" and path of the given name
+     * @param name path of the {@link Identifier} to return
+     * @return {@link Identifier} with namespace of "magna" and path of the given name
      */
     public static Identifier id(String name) {
         return new Identifier("magna", name);
@@ -40,7 +39,7 @@ public class Magna implements ModInitializer {
      * <p>
      * For more information on Vanilla Hammers, visit the <a href=https://github.com/Draylar/vanilla-hammers">Vanilla Hammers GitHub repo</a>.
      *
-     * @return  whether Vanilla Hammers is installed
+     * @return whether Vanilla Hammers is installed
      */
     public static boolean isVanillaHammersInstalled() {
         return FabricLoader.getInstance().isModLoaded("vanilla-hammers");
@@ -55,7 +54,7 @@ public class Magna implements ModInitializer {
      * <p>
      * For more information on Vanilla Excavators, visit the <a href=https://github.com/Draylar/vanilla-excavators">Vanilla Excavators GitHub repo</a>.
      *
-     * @return  whether Vanilla Excavators is installed
+     * @return whether Vanilla Excavators is installed
      */
     public static boolean isVanillaExcavatorsInstalled() {
         return FabricLoader.getInstance().isModLoaded("vanillaexcavators");

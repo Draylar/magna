@@ -1,11 +1,9 @@
 package draylar.magna.config;
 
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.annotation.Config;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
+import draylar.omegaconfig.api.Comment;
+import draylar.omegaconfig.api.Config;
 
-@Config(name = "magna")
-public class MagnaConfig implements ConfigData {
+public class MagnaConfig implements Config {
     @Comment(value = "Whether an extended hitbox should show air blocks (or other blocks without hitboxes).")
     public boolean highlightAirBlocks = false;
 
@@ -14,7 +12,7 @@ public class MagnaConfig implements ConfigData {
 
     @Comment(value = "Whether extended hitboxes should be enabled for the appropriate tools.")
     public boolean enableExtendedHitbox = true;
-    
+
     @Comment(value = "Whether block breaking should show animation on all blocks.")
     public boolean enableAllBlockBreakingAnimation = true;
 
@@ -29,4 +27,9 @@ public class MagnaConfig implements ConfigData {
 
     @Comment(value = "If true, dropped items are automatically inserted into the inventory.")
     public boolean autoPickup = false;
+
+    @Override
+    public String getName() {
+        return "magna";
+    }
 }

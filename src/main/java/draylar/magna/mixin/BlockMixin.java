@@ -41,17 +41,20 @@ public abstract class BlockMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    private static void smeltItems(BlockState state, World world, BlockPos pos, BlockEntity blockEntity, Entity entity, ItemStack tool, CallbackInfo ci) {
-        if(!world.isClient && tool.getItem() instanceof MagnaTool && entity instanceof PlayerEntity) {
-            MagnaTool magnaItem = (MagnaTool) tool.getItem();
+    private static void processItems(BlockState state, World world, BlockPos pos, BlockEntity blockEntity, Entity entity, ItemStack tool, CallbackInfo ci) {
+        if(!world.isClient && tool.getItem() instanceof MagnaTool magnaItem && entity instanceof PlayerEntity) {
             BlockProcessor processor = magnaItem.getProcessor(world, (PlayerEntity) entity, pos, tool);
 
-            // drop each stack, smelted
-            getDroppedStacks(state, (ServerWorld)world, pos, blockEntity, entity, tool).forEach((drop) -> {
-                dropStack(world, pos, processor.process(tool, drop));
-            });
+            // Process each dropped stack using the given MagnaTool's processor.
+            // This is usually for implementing a mechanic such as Autosmelt.
+            List<ItemStack> dropped = getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, entity, tool);
+            if(dropped != null) {
+                dropped.forEach((drop) -> {
+                    dropStack(world, pos, processor.process(tool, drop));
+                });
+            }
 
-            // cancel
+            // Cancel the original drop.
             state.onStacksDropped((ServerWorld) world, pos, tool);
             ci.cancel();
         }

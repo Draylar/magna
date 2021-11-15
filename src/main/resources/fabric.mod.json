@@ -15,15 +15,12 @@
     "homepage": "https://github.com/Draylar/magna",
     "issues": "https://github.com/Draylar/magna/issues"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/magna/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       "draylar.magna.Magna"
-    ],
-    "modmenu": [
-      "draylar.magna.integration.ModMenuIntegration"
     ]
   },
   "custom": {
