@@ -18,7 +18,6 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.jamieswhiteshirt.com/libs-release/" }
-    maven { url "https://maven.terraformersmc.com/releases/" }
 }
 
 dependencies {
@@ -30,9 +29,6 @@ dependencies {
     // config
     modImplementation 'com.github.Draylar.omega-config:omega-config-base:1.0.8-1.17'
     include 'com.github.Draylar.omega-config:omega-config-base:1.0.8-1.17'
-
-    // dev modmenu
-    modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
     // dev Reach Entity Attributes for testing tools with extended reach (or players)
     modImplementation "com.jamieswhiteshirt:reach-entity-attributes:${project.rea_version}"
