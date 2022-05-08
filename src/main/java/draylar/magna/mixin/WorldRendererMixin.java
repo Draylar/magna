@@ -12,7 +12,6 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.client.render.VertexConsumer;
@@ -66,7 +65,7 @@ public class WorldRendererMixin {
         if (heldStack.getItem() instanceof MagnaTool tool && config.enableExtendedHitbox) {
 
             // do not show extended outline if player is sneaking and the config option is enabled
-            if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
+            if (tool.showExtendedOutline(heldStack, client.player)) {
 
                 // only show extended outline for block raytraces
                 if (client.crosshairTarget instanceof BlockHitResult crosshairTarget) {

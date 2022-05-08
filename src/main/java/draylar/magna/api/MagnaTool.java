@@ -3,6 +3,7 @@ package draylar.magna.api;
 import draylar.magna.Magna;
 import draylar.magna.api.event.ToolRadiusCallback;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -167,5 +168,23 @@ public interface MagnaTool {
      */
     default BlockFinder getBlockFinder() {
         return BlockFinder.DEFAULT;
+    }
+
+    /**
+     * If this {@link MagnaTool} is allowed to render an extended outline while hovering over a block, returns {@code true}.
+     * This method is (under normal circumstances) only called on the client.
+     *
+     * <p>
+     * This method provides similar functionality to {@link MagnaTool#renderOutline(World, BlockHitResult, PlayerEntity, ItemStack)} as they are called in the same location.
+     * This method was added on top to preserve compatibility with projects overriding {@link MagnaTool#renderOutline(World, BlockHitResult, PlayerEntity, ItemStack)} and not calling super.
+     * If you are looking to override general outline check behavior, prefer {@link MagnaTool#renderOutline(World, BlockHitResult, PlayerEntity, ItemStack)}. This method is intended for
+     *  checking config options and global conditions, rather than {@code ItemStack} or player specific traits.
+     *
+     * @param stack stack containing this {@code MagnaTool}
+     * @param player player holding the stack
+     * @return {@code true} if this tool can render an extended outline while hovering over a block
+     */
+    default boolean showExtendedOutline(ItemStack stack, PlayerEntity player) {
+        return !Magna.CONFIG.disableExtendedHitboxWhileSneaking || !player.isSneaking();
     }
 }
