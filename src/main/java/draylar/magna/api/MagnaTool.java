@@ -3,7 +3,6 @@ package draylar.magna.api;
 import draylar.magna.Magna;
 import draylar.magna.api.event.ToolRadiusCallback;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -126,25 +125,38 @@ public interface MagnaTool {
      * @return             whether the break was successful
      */
     default boolean attemptBreak(World world, BlockPos pos, PlayerEntity player, int breakRadius, BlockProcessor processor) {
-        if (Magna.CONFIG.breakSingleBlockWhenSneaking && player.isSneaking()) {
+        ItemStack stack = player.getMainHandStack();
+        if (ignoreRadiusBreak(stack, player)) {
             return false;
         }
 
-        // calculate initial hardness & get current breaking stack
-        ItemStack mainHandStack = player.getMainHandStack();
-
         // only do a 3x3 break if the player's tool is effective on the block they are breaking
         // this makes it so breaking gravel doesn't break nearby stone
-        if (isBlockValidForBreaking(world, pos, mainHandStack)) {
-            int radius = ToolRadiusCallback.EVENT.invoker().getRadius(mainHandStack, breakRadius);
-            int depth = getDepth(mainHandStack);
+        if (isBlockValidForBreaking(world, pos, stack)) {
+            int radius = ToolRadiusCallback.EVENT.invoker().getRadius(stack, breakRadius);
+            int depth = getDepth(stack);
 
             // break blocks
-            BlockBreaker.breakInRadius(world, player, radius, depth, getBlockFinder(), (view, breakPos) -> isBlockValidForBreaking(view, breakPos, mainHandStack), processor, true);
+            BlockBreaker.breakInRadius(world, player, radius, depth, getBlockFinder(), (view, breakPos) -> isBlockValidForBreaking(view, breakPos, stack), processor, true);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Returns {@code true} if this {@link MagnaTool} is NOT allowed to break in a larger radius based on player & global config state.
+     * Similar to {@link MagnaTool#showExtendedOutline(ItemStack, PlayerEntity)}, but used for server-side breaking.
+     *
+     * <p>
+     * Implementers should call {@code super} when overriding this method unless they intend to change tool sneak functionality.
+     *
+     * @param stack main hand stack of player
+     * @param player player using this {@link MagnaTool}
+     * @return {@code true} if this {@link MagnaTool} is NOT allowed to break bonus blocks with respect to config/player
+     */
+    default boolean ignoreRadiusBreak(ItemStack stack, PlayerEntity player) {
+        return Magna.CONFIG.breakSingleBlockWhenSneaking && player.isSneaking();
     }
 
     /**
