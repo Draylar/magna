@@ -153,7 +153,7 @@ public class WorldRendererMixin {
         if (heldStack.getItem() instanceof MagnaTool tool && config.enableAllBlockBreakingAnimation) {
 
             // check if we should display the outline based on config and sneaking
-            if (!config.disableExtendedHitboxWhileSneaking || !client.player.isSneaking()) {
+            if (tool.showExtendedOutline(heldStack, client.player)) {
                 HitResult crosshairTarget = client.crosshairTarget;
 
                 // ensure we're not displaying an outline on a creeper or air
