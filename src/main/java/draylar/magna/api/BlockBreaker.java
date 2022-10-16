@@ -119,7 +119,7 @@ public class BlockBreaker {
 
                         // drop items
                         dropItems(player, world, processed, offsetPos);
-                        state.onStacksDropped((ServerWorld) world, pos, player.getMainHandStack());
+                        state.onStacksDropped((ServerWorld) world, pos, player.getMainHandStack(), true);
 
                         if (damageTool) {
                             ItemStack itemStack = player.getMainHandStack();

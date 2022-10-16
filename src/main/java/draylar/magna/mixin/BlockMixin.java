@@ -55,7 +55,7 @@ public abstract class BlockMixin {
             }
 
             // Cancel the original drop.
-            state.onStacksDropped((ServerWorld) world, pos, tool);
+            state.onStacksDropped((ServerWorld) world, pos, tool, true);
             ci.cancel();
         }
     }
