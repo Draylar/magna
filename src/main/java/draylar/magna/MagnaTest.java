@@ -13,10 +13,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolMaterials;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -30,14 +31,14 @@ public class MagnaTest {
     public static void initialize() {
         // Standard Hammer with a tool material of Diamond.
         Registry.register(
-                Registry.ITEM,
+                Registries.ITEM,
                 new Identifier("magna", "hammer_test"),
                 new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
         );
 
         // Standard Hammer with a tool material of Diamond and a modified depth.
         Registry.register(
-                Registry.ITEM,
+                Registries.ITEM,
                 new Identifier("magna", "depth_test"),
                 new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings()) {
 
@@ -50,14 +51,14 @@ public class MagnaTest {
 
         // Standard Excavator with a tool material of Wood.
         Registry.register(
-                Registry.ITEM,
+                Registries.ITEM,
                 new Identifier("magna", "excavator_test"),
                 new ExcavatorItem(ToolMaterials.WOOD, 0, 0, new Item.Settings())
         );
 
         // Hammer with extended reach.
         Registry.register(
-                Registry.ITEM,
+                Registries.ITEM,
                 new Identifier("magna", "reach_test"),
                 new HammerItem(ToolMaterials.WOOD, 0, 0, new Item.Settings()) {
                     @Override
@@ -71,7 +72,7 @@ public class MagnaTest {
 
         // Hammer with a huge radius and no outline.
         Registry.register(
-                Registry.ITEM,
+                Registries.ITEM,
                 new Identifier("magna", "outline_test"),
                 new HammerItem(ToolMaterials.WOOD, 0, 0, new Item.Settings()) {
                     @Override
@@ -93,7 +94,7 @@ public class MagnaTest {
 
         // Hammer that only breaks blocks inside its radius with an odd x or (exclusive) z position.
         Registry.register(
-                Registry.ITEM,
+                Registries.ITEM,
                 new Identifier("magna", "custom_breaker_test"),
                 new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings()) {
                     private final BlockFinder TEST_FINDER = new BlockFinder() {
