@@ -28,15 +28,6 @@ public class MagnaConfig implements Config {
     @Comment(value = "If true, dropped items are automatically inserted into the inventory.")
     public boolean autoPickup = false;
 
-    @Comment(value = "If true, curse of gigantism can be applied to items with enchantments that aren't efficiency.")
-    public boolean gigantismCompatibleWithOtherEnchants = false;
-
-    @Comment(value = "Speed modifier of gigantism curse.")
-    public float gigantismSpeedModifier = 0.2F;
-
-    @Comment(value = "Max level for curse of gigantism.")
-    public int gigantismMaxLevel = 1;
-
     @Override
     public String getName() {
         return "magna";
