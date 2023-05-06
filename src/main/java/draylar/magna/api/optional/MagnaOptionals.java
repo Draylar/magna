@@ -7,9 +7,9 @@ import draylar.magna.item.ExcavatorItem;
 import draylar.magna.item.HammerItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class MagnaOptionals {
     public static void optInForCurse() {
         if(CURSE_OF_GIGANTISM == null) {
             CURSE_OF_GIGANTISM = Registry.register(
-                    Registry.ENCHANTMENT,
+                    Registries.ENCHANTMENT,
                     new Identifier("magna", "gigantism_curse"),
                     new CurseOfGigantismEnchantment()
             );
