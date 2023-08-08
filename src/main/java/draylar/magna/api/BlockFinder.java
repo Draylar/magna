@@ -1,6 +1,5 @@
 package draylar.magna.api;
 
-import draylar.magna.api.reach.ReachDistanceHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,6 +15,8 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static draylar.magna.api.reach.ReachDistanceHelper.getReachDistance;
 
 public interface BlockFinder {
     BlockFinder DEFAULT = new BlockFinder() {};
@@ -43,7 +44,7 @@ public interface BlockFinder {
         // collect information on camera
         Vec3d cameraPos = playerEntity.getCameraPosVec(1);
         Vec3d rotation = playerEntity.getRotationVec(1);
-        double reachDistance = ReachDistanceHelper.getReachDistance(playerEntity);
+        double reachDistance = getReachDistance(playerEntity);
         Vec3d combined = cameraPos.add(rotation.x * reachDistance, rotation.y * reachDistance, rotation.z * reachDistance);
 
         // find block the player is currently looking at
