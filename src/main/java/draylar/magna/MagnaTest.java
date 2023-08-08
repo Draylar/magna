@@ -1,13 +1,8 @@
 package draylar.magna;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import draylar.magna.api.BlockFinder;
 import draylar.magna.item.ExcavatorItem;
 import draylar.magna.item.HammerItem;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
