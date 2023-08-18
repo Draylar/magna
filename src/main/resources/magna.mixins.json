@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "draylar.magna.mixin",
+  "package": "dev.draylar.magna.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "BlockMixin",

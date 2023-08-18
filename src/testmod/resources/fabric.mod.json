@@ -1,15 +1,14 @@
 {
   "schemaVersion": 1,
-  "id": "magna",
+  "id": "magna-test",
   "version": "${version}",
-  "name": "Magna",
-  "description": "Magna is the library that powers Vanilla Hammers and other large-break tool mods.",
+  "name": "Magna Test",
+  "description": "Magna test suite",
   "authors": [
     "Draylar"
   ],
   "contributors": [
-    "GabrielOlvH",
-    "Platymemo"
+
   ],
   "contact": {
     "homepage": "https://github.com/Draylar/magna",
@@ -20,18 +19,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.draylar.magna.Magna"
+      "dev.draylar.magna.test.MagnaTest"
     ]
   },
-  "custom": {
-    "modmenu": {
-      "badges": [ "library" ]
-    }
-  },
-  "mixins": [
-    "magna.mixins.json"
-  ],
-  "accessWidener": "magna.accessWidener",
   "depends": {
     "fabricloader": ">=0.14.22",
     "fabric": "*"

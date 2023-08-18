@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = project.mod_version + "-" + project.minecraft_version
+version = project.mod_version + "+" + project.minecraft_version
 group = project.maven_group
 
 loom {
@@ -31,34 +31,61 @@ dependencies {
     // modImplementation "com.jamieswhiteshirt:reach-entity-attributes:${project.rea_version}"
 }
 
+sourceSets {
+    testmod {
+        compileClasspath += main.compileClasspath
+        runtimeClasspath += main.runtimeClasspath
+    }
+}
+
+dependencies {
+    afterEvaluate {
+        testmodImplementation sourceSets.main.output
+    }
+}
+
+loom {
+    runs {
+        testmodClient {
+            client()
+            name = "Test Mod Client"
+            source sourceSets.testmod
+        }
+
+        testmodServer {
+            server()
+            name = "Test Mod Server"
+            source sourceSets.testmod
+        }
+    }
+}
+
 java {
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
     // If you remove this line, sources will not be generated.
-    // withSourcesJar()
+     withSourcesJar()
 }
 
 jar {
     from "LICENSE"
 }
 
-// configure the maven publication
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-//            artifact(sourcesJar) {
-//                builtBy remapSourcesJar
-//            }
+            from components.java
         }
     }
-}
 
-// select the repositories you want to publish to
-repositories {
-    // uncomment to publish to the local maven
-    // mavenLocal()
+    repositories {
+        maven {
+            name = "draylarRepository"
+            url = "https://maven.draylar.dev/releases"
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
 }
