@@ -4,11 +4,9 @@ import draylar.magna.Magna;
 import draylar.magna.api.MagnaTool;
 import draylar.magna.api.event.ToolRadiusCallback;
 import draylar.magna.config.MagnaConfig;
-import draylar.magna.impl.AppendedObjectIterator;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -32,7 +30,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -139,13 +136,6 @@ public class WorldRendererMixin {
     @Invoker("drawCuboidShapeOutline")
     public static void drawCuboidShapeOutline(MatrixStack matrices, VertexConsumer vertexConsumer, VoxelShape shape, double offsetX, double offsetY, double offsetZ, float red, float green, float blue, float alpha) {
         throw new AssertionError();
-    }
-
-    @ModifyVariable(method = "render",
-                    at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;iterator()Lit/unimi/dsi/fastutil/objects/ObjectIterator;",
-                             shift = At.Shift.BY, by = 2), ordinal = 0)
-    private ObjectIterator<Long2ObjectMap.Entry<SortedSet<BlockBreakingInfo>>> appendBlockBreakingProgressions(ObjectIterator<Long2ObjectMap.Entry<SortedSet<BlockBreakingInfo>>> originalIterator) {
-        return new AppendedObjectIterator<>(originalIterator, getCurrentExtraBreakingInfos());
     }
     
     @Unique
