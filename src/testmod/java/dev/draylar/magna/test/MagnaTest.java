@@ -4,6 +4,7 @@ import dev.draylar.magna.api.BlockFinder;
 import dev.draylar.magna.item.ExcavatorItem;
 import dev.draylar.magna.item.HammerItem;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +30,18 @@ public class MagnaTest implements ModInitializer {
                 Registries.ITEM,
                 new Identifier("magna", "hammer_test"),
                 new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings())
+        );
+
+        // Standard hammer with a particularly slow mining speed. Useful for testing break speed.
+        Registry.register(
+                Registries.ITEM,
+                new Identifier("magna", "hammer_slow_test"),
+                new HammerItem(ToolMaterials.DIAMOND, 0, 0, new Item.Settings()) {
+                    @Override
+                    public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+                        return 1.0f;
+                    }
+                }
         );
 
         // Standard Hammer with a tool material of Diamond and a modified depth.
