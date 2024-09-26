@@ -1,9 +1,13 @@
 package draylar.magna.config;
 
-import draylar.omegaconfig.api.Comment;
-import draylar.omegaconfig.api.Config;
 
-public class MagnaConfig implements Config {
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
+
+@Config(name = "magna")
+public class MagnaConfig implements ConfigData {
     @Comment(value = "Whether an extended hitbox should show air blocks (or other blocks without hitboxes).")
     public boolean highlightAirBlocks = false;
 
@@ -28,8 +32,16 @@ public class MagnaConfig implements Config {
     @Comment(value = "If true, dropped items are automatically inserted into the inventory.")
     public boolean autoPickup = false;
 
-    @Override
-    public String getName() {
-        return "magna";
+    @Comment(value = "If true, curse of gigantism can be applied to items with enchantments that aren't efficiency.")
+    public boolean gigantismCompatibleWithOtherEnchants = false;
+
+    @Comment(value = "Speed modifier of gigantism curse.")
+    public float gigantismSpeedModifier = 0.2F;
+
+    @Comment(value = "Max level for curse of gigantism.")
+    public int gigantismMaxLevel = 1;
+
+    public static MagnaConfig getInstance() {
+        return AutoConfig.getConfigHolder(MagnaConfig.class).getConfig();
     }
 }

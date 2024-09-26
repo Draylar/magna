@@ -1,6 +1,7 @@
 package draylar.magna.api;
 
 import draylar.magna.Magna;
+import draylar.magna.config.MagnaConfig;
 import draylar.magna.impl.MagnaPlayerInteractionManagerExtension;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.Block;
@@ -146,7 +147,7 @@ public class BlockBreaker {
      */
    private static void dropItems(PlayerEntity player, World world, List<ItemStack> stacks, Vec3d pos) {
         for(ItemStack stack : stacks) {
-            if (Magna.CONFIG.autoPickup) {
+            if (MagnaConfig.getInstance().autoPickup) {
                 player.getInventory().insertStack(stack);
             }
 
@@ -157,7 +158,7 @@ public class BlockBreaker {
             }
         }
 
-        if(!stacks.isEmpty() && Magna.CONFIG.autoPickup) {
+        if(!stacks.isEmpty() && MagnaConfig.getInstance().autoPickup) {
             world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
         }
     }

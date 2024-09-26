@@ -1,7 +1,9 @@
 package draylar.magna.enchantment;
 
+import draylar.magna.Magna;
 import draylar.magna.api.optional.MagnaOptionals;
 import draylar.magna.api.optional.StackPredicate;
+import draylar.magna.config.MagnaConfig;
 import draylar.magna.item.ExcavatorItem;
 import draylar.magna.item.HammerItem;
 import net.minecraft.enchantment.Enchantment;
@@ -20,7 +22,7 @@ public class CurseOfGigantismEnchantment extends Enchantment {
 
     @Override
     protected boolean canAccept(Enchantment other) {
-        return other == Enchantments.EFFICIENCY;
+        return MagnaConfig.getInstance().gigantismCompatibleWithOtherEnchants || (other == Enchantments.EFFICIENCY);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class CurseOfGigantismEnchantment extends Enchantment {
 
     @Override
     public int getMaxLevel() {
-        return 1;
+        return MagnaConfig.getInstance().gigantismMaxLevel;
     }
 
     @Override

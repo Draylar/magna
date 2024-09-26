@@ -2,6 +2,7 @@ package draylar.magna.api;
 
 import draylar.magna.Magna;
 import draylar.magna.api.event.ToolRadiusCallback;
+import draylar.magna.config.MagnaConfig;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -156,7 +157,7 @@ public interface MagnaTool {
      * @return {@code true} if this {@link MagnaTool} is NOT allowed to break bonus blocks with respect to config/player
      */
     default boolean ignoreRadiusBreak(ItemStack stack, PlayerEntity player) {
-        return Magna.CONFIG.breakSingleBlockWhenSneaking && player.isSneaking();
+        return MagnaConfig.getInstance().breakSingleBlockWhenSneaking && player.isSneaking();
     }
 
     /**
@@ -197,6 +198,6 @@ public interface MagnaTool {
      * @return {@code true} if this tool can render an extended outline while hovering over a block
      */
     default boolean showExtendedOutline(ItemStack stack, PlayerEntity player) {
-        return !Magna.CONFIG.disableExtendedHitboxWhileSneaking || !player.isSneaking();
+        return !MagnaConfig.getInstance().disableExtendedHitboxWhileSneaking || !player.isSneaking();
     }
 }

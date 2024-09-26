@@ -1,14 +1,13 @@
 package draylar.magna;
 
 import draylar.magna.config.MagnaConfig;
-import draylar.omegaconfig.OmegaConfig;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 
 public class Magna implements ModInitializer {
-
-    public static MagnaConfig CONFIG = OmegaConfig.register(MagnaConfig.class);
 
     @Override
     public void onInitialize() {
@@ -18,6 +17,7 @@ public class Magna implements ModInitializer {
         if(FabricLoader.getInstance().isDevelopmentEnvironment() && FabricLoader.getInstance().isModLoaded("reach-entity-attributes")) {
             MagnaTest.initialize();
         }
+        AutoConfig.register(MagnaConfig.class, JanksonConfigSerializer::new);
     }
 
     /**

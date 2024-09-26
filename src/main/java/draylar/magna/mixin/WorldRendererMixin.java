@@ -49,7 +49,6 @@ public class WorldRendererMixin {
 
     @Inject(at = @At("HEAD"), method = "drawBlockOutline", cancellable = true)
     private void drawBlockOutline(MatrixStack stack, VertexConsumer vertexConsumer, Entity entity, double d, double e, double f, BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
-        MagnaConfig config = Magna.CONFIG;
 
         // ensure player is not null
         if(this.client.player == null) {
@@ -63,7 +62,7 @@ public class WorldRendererMixin {
 
         // show extended outline if the player is holding a magna tool
         ItemStack heldStack = this.client.player.getInventory().getMainHandStack();
-        if (heldStack.getItem() instanceof MagnaTool tool && config.enableExtendedHitbox) {
+        if (heldStack.getItem() instanceof MagnaTool tool && MagnaConfig.getInstance().enableExtendedHitbox) {
 
             // do not show extended outline if player is sneaking and the config option is enabled
             if (tool.showExtendedOutline(heldStack, client.player)) {
@@ -95,16 +94,16 @@ public class WorldRendererMixin {
                             BlockState offsetShape = world.getBlockState(position);
 
                             // if enableFull3x3 is 'true', all blocks will gain an outline, even if they are air
-                            if (!offsetShape.isAir() || config.highlightAirBlocks) {
+                            if (!offsetShape.isAir() || MagnaConfig.getInstance().highlightAirBlocks) {
                                 // if fullBlockHitbox is 'true', all blocks will have a 16x16x16 hitbox regardless of their outline shape
-                                if (!config.fullBlockShapes) {
-                                    if (!config.individualBlockOutlines) {
+                                if (!MagnaConfig.getInstance().fullBlockShapes) {
+                                    if (!MagnaConfig.getInstance().individualBlockOutlines) {
                                         outlineShapes.set(0, VoxelShapes.union(outlineShapes.get(0), offsetShape.getOutlineShape(world, position).offset(diffPos.getX(), diffPos.getY(), diffPos.getZ())));
                                     } else {
                                         outlineShapes.add(offsetShape.getOutlineShape(world, position).offset(diffPos.getX(), diffPos.getY(), diffPos.getZ()));
                                     }
                                 } else {
-                                    if (!config.individualBlockOutlines) {
+                                    if (!MagnaConfig.getInstance().individualBlockOutlines) {
                                         outlineShapes.set(0, VoxelShapes.union(outlineShapes.get(0), VoxelShapes.fullCube().offset(diffPos.getX(), diffPos.getY(), diffPos.getZ())));
                                     } else {
                                         outlineShapes.add(VoxelShapes.fullCube().offset(diffPos.getX(), diffPos.getY(), diffPos.getZ()));
@@ -152,11 +151,10 @@ public class WorldRendererMixin {
     private Long2ObjectMap<BlockBreakingInfo> getCurrentExtraBreakingInfos() {
         assert client.player != null;
 
-        MagnaConfig config = Magna.CONFIG;
         ItemStack heldStack = this.client.player.getInventory().getMainHandStack();
 
         // make sure we should display the outline based on the tool
-        if (heldStack.getItem() instanceof MagnaTool tool && config.enableAllBlockBreakingAnimation) {
+        if (heldStack.getItem() instanceof MagnaTool tool && MagnaConfig.getInstance().enableAllBlockBreakingAnimation) {
 
             // check if we should display the outline based on config and sneaking
             if (tool.showExtendedOutline(heldStack, client.player)) {

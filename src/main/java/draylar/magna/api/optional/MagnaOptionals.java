@@ -2,13 +2,15 @@ package draylar.magna.api.optional;
 
 import draylar.magna.api.event.ToolMiningSpeedMultiplierCallback;
 import draylar.magna.api.event.ToolRadiusCallback;
+import draylar.magna.config.MagnaConfig;
 import draylar.magna.enchantment.CurseOfGigantismEnchantment;
 import draylar.magna.item.ExcavatorItem;
 import draylar.magna.item.HammerItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ public class MagnaOptionals {
     public static void optInForCurse() {
         if(CURSE_OF_GIGANTISM == null) {
             CURSE_OF_GIGANTISM = Registry.register(
-                    Registry.ENCHANTMENT,
+                    Registries.ENCHANTMENT,
                     new Identifier("magna", "gigantism_curse"),
                     new CurseOfGigantismEnchantment()
             );
@@ -38,8 +40,9 @@ public class MagnaOptionals {
 
         // setup 80% speed decrease while using the curse
         ToolMiningSpeedMultiplierCallback.EVENT.register((tool, state, player, currentMultiplier) -> {
-            if(EnchantmentHelper.getLevel(MagnaOptionals.CURSE_OF_GIGANTISM, tool) > 0) {
-                return currentMultiplier * 0.2f;
+            int gigantismLevel = EnchantmentHelper.getLevel(MagnaOptionals.CURSE_OF_GIGANTISM, tool);
+            if (gigantismLevel > 0) {
+                return (float) (currentMultiplier * MagnaConfig.getInstance().gigantismSpeedModifier * (1.0F/Math.pow(gigantismLevel,2)));
             }
 
             return currentMultiplier;
@@ -47,8 +50,9 @@ public class MagnaOptionals {
 
         // setup radius increase while the curse is applied to a tool
         ToolRadiusCallback.EVENT.register((tool, currentRadius) -> {
-            if(EnchantmentHelper.getLevel(MagnaOptionals.CURSE_OF_GIGANTISM, tool) > 0) {
-                return currentRadius + 1;
+            int gigantismLevel = EnchantmentHelper.getLevel(MagnaOptionals.CURSE_OF_GIGANTISM, tool);
+            if (gigantismLevel > 0) {
+                return currentRadius + gigantismLevel;
             }
 
             return currentRadius;
